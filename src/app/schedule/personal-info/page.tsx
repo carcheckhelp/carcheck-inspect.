@@ -19,13 +19,13 @@ const PersonalInfoPage = () => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
       <header className="absolute top-8 left-8">
-        <Link href="/" legacyBehavior>
-          <a>
-            <h1 className="text-5xl font-bold">
-              <span style={{ color: '#B8860B' }}>Car</span>
-              <span style={{ color: '#FFD700' }}>Check</span>
-            </h1>
-          </a>
+        <Link href="/">
+
+          <h1 className="text-5xl font-bold">
+            <span style={{ color: '#B8860B' }}>Car</span>
+            <span style={{ color: '#FFD700' }}>Check</span>
+          </h1>
+
         </Link>
       </header>
       <main className="w-full max-w-lg bg-gray-900 p-8 rounded-lg shadow-lg">
@@ -65,8 +65,8 @@ const PersonalInfoPage = () => {
             />
           </div>
           <div className="flex justify-between mt-8">
-            <Link href="/schedule/package" legacyBehavior>
-              <a className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">Atrás</a>
+            <Link href="/schedule/package" className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">
+              Atrás
             </Link>
             <button type="submit" className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300">
               Siguiente

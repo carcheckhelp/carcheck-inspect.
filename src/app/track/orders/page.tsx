@@ -16,8 +16,8 @@ const OrdersPage = () => {
           <span style={{ color: '#FFD700' }}>Check</span>
         </h1>
         <nav>
-          <Link href="/track" legacyBehavior>
-            <a className="text-yellow-500 hover:underline">Buscar de Nuevo</a>
+          <Link href="/track" className="text-yellow-500 hover:underline">
+            Buscar de Nuevo
           </Link>
         </nav>
       </header>

@@ -25,17 +25,17 @@ const InspectorDashboardPage = () => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center p-8">
       <header className="w-full max-w-6xl flex justify-between items-center mb-8">
-        <Link href="/" legacyBehavior>
-          <a>
-            <h1 className="text-5xl font-bold">
-              <span style={{ color: '#B8860B' }}>Car</span>
-              <span style={{ color: '#FFD700' }}>Check</span>
-            </h1>
-          </a>
+        <Link href="/">
+
+          <h1 className="text-5xl font-bold">
+            <span style={{ color: '#B8860B' }}>Car</span>
+            <span style={{ color: '#FFD700' }}>Check</span>
+          </h1>
+
         </Link>
         <nav>
-          <Link href="/inspector/login" legacyBehavior>
-            <a className="text-yellow-500 hover:underline">Cerrar Sesión</a>
+          <Link href="/inspector/login" className="text-yellow-500 hover:underline">
+            Cerrar Sesión
           </Link>
         </nav>
       </header>
@@ -89,8 +89,8 @@ const InspectorDashboardPage = () => {
           </table>
         </div>
         <div className="mt-8 text-center">
-            <Link href="/" legacyBehavior>
-                <a className="text-yellow-500 hover:underline">Volver a Inicio</a>
+            <Link href="/" className="text-yellow-500 hover:underline">
+                Volver a Inicio
             </Link>
         </div>
       </main>

@@ -14,13 +14,13 @@ const PackagePage = () => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
       <header className="absolute top-8 left-8">
-        <Link href="/" legacyBehavior>
-          <a>
-            <h1 className="text-5xl font-bold">
-              <span style={{ color: '#B8860B' }}>Car</span>
-              <span style={{ color: '#FFD700' }}>Check</span>
-            </h1>
-          </a>
+        <Link href="/">
+
+          <h1 className="text-5xl font-bold">
+            <span style={{ color: '#B8860B' }}>Car</span>
+            <span style={{ color: '#FFD700' }}>Check</span>
+          </h1>
+
         </Link>
       </header>
       <main className="w-full max-w-4xl text-center">
@@ -58,8 +58,8 @@ const PackagePage = () => {
           </div>
         </div>
         <div className="mt-8">
-          <Link href="/" legacyBehavior>
-            <a className="text-yellow-500 hover:underline">Volver al Inicio</a>
+          <Link href="/" className="text-yellow-500 hover:underline">
+            Volver al Inicio
           </Link>
         </div>
       </main>

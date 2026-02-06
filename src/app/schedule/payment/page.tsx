@@ -12,13 +12,13 @@ const PaymentPage = () => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
       <header className="absolute top-8 left-8">
-        <Link href="/" legacyBehavior>
-          <a>
-            <h1 className="text-5xl font-bold">
-              <span style={{ color: '#B8860B' }}>Car</span>
-              <span style={{ color: '#FFD700' }}>Check</span>
-            </h1>
-          </a>
+        <Link href="/">
+
+          <h1 className="text-5xl font-bold">
+            <span style={{ color: '#B8860B' }}>Car</span>
+            <span style={{ color: '#FFD700' }}>Check</span>
+          </h1>
+
         </Link>
       </header>
       <main className="w-full max-w-md bg-gray-900 p-8 rounded-lg shadow-lg">
@@ -48,8 +48,8 @@ const PaymentPage = () => {
             </p>
         </div>
         <div className="mt-8 text-center">
-          <Link href="/schedule/vehicle-info" legacyBehavior>
-            <a className="text-yellow-500 hover:underline">Atrás</a>
+          <Link href="/schedule/vehicle-info" className="text-yellow-500 hover:underline">
+            Atrás
           </Link>
         </div>
       </main>

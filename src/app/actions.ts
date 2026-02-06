@@ -75,3 +75,31 @@ export async function generateInspectionReport(inspectionData: any) {
     report: simulatedGeminiResponse,
   };
 }
+
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string(),
+});
+
+export async function loginInspector(prevState: any, formData: FormData) {
+    const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return {
+            error: "Email o contraseña inválidos.",
+        };
+    }
+
+    const { email, password } = validatedFields.data;
+
+    if (email === "carcheckhelp1@outlook.com" && password === "Febrero2929") {
+        return {
+            success: true,
+            message: "Inicio de sesión exitoso.",
+        };
+    }
+
+    return {
+        error: "Credenciales incorrectas.",
+    };
+}

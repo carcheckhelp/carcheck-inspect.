@@ -4,15 +4,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const TrackOrderPage = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
-  const [orderNumber, setOrderNumber] = useState('');
+  const [email, setEmail] = useState('');
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Fetch and display orders
-    console.log('Tracking order with:', { emailOrPhone, orderNumber });
-    router.push('/track/orders');
+    router.push(`/track/orders?email=${email}`);
   };
 
   return (
@@ -31,23 +28,12 @@ const TrackOrderPage = () => {
         <h2 className="text-3xl font-bold mb-6 text-center">Seguir Orden</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="emailOrPhone" className="block text-lg font-bold mb-2">Email o Teléfono</label>
+            <label htmlFor="emailOrPhone" className="block text-lg font-bold mb-2">Email</label>
             <input
-              type="text"
-              id="emailOrPhone"
-              value={emailOrPhone}
-              onChange={(e) => setEmailOrPhone(e.target.value)}
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="orderNumber" className="block text-lg font-bold mb-2">Número de Orden</label>
-            <input
-              type="text"
-              id="orderNumber"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
               required
             />

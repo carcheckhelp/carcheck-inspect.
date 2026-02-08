@@ -25,26 +25,26 @@ CarCheck is a web application built with Next.js, Firebase, and Gemini, designed
     *   **Agendar Cita (Schedule Appointment):** Button to start the appointment scheduling process.
     *   **Seguir Orden (Track Order):** Form to track an existing order.
     *   **Inspector:** Login for inspectors.
+*   **Footer:** Social media icons (WhatsApp, Instagram, Facebook) with links to the respective profiles and copyright information.
 
 ### 2. Agendar Cita (Schedule Appointment) Flow
 
 *   **Package Selection (`/schedule/package`):**
-    *   **Core ($4000):** ABS, SRS, TPMS, engine, body, and lights inspection.
-    *   **CarCheck Plus:** Core + Carfax report.
-    *   **Pro:** CarCheck Plus for vehicles 2020 and newer.
+    *   Packages with prices: Core ($4000), CarCheck Plus ($5000), Pro ($8000).
+    *   Selected package name and price are stored in `localStorage` to ensure consistency.
 *   **Personal Information (`/schedule/personal-info`):**
     *   Form with fields: Name, Phone, Email.
 *   **Vehicle Information (`/schedule/vehicle-info`):**
-    *   Form with fields:
-        *   Make (dropdown with a comprehensive list of brands).
-        *   Model.
-        *   VIN (Chassis).
-        *   Year.
-        *   Location (Google Maps API integration).
+    *   Form with fields for Make, Model, VIN, and Year.
+    *   **Location Selection:**
+        *   Integrated Google Map for selecting the vehicle's location.
+        *   The "Next" button is disabled until a location is selected to ensure data integrity.
 *   **Payment (`/schedule/payment`):**
-    *   Options: PayPal, Bank Transfer, Cash.
+    *   The price of the selected package is dynamically displayed.
+    *   Payment method selection: PayPal, Bank Transfer, or Cash.
 *   **Confirmation (`/schedule/confirmation`):**
-    *   Displays the automatically generated order number.
+    *   Displays the final order summary, including the dynamically retrieved package name and price.
+    *   An automatically generated order number is provided.
 
 ### 3. Seguir Orden (Track Order) Flow
 
@@ -52,7 +52,7 @@ CarCheck is a web application built with Next.js, Firebase, and Gemini, designed
     *   Input fields: Email or Phone + Order Number.
 *   **Order Status (`/track/orders`):**
     *   Displays a list of the client's orders with status: "En proceso" (In Process) or "Completado" (Completed).
-    *   Each order includes a downloadable report.
+    *   For completed orders, a "Ver Informe" button links to the detailed report page.
 
 ### 4. Inspector Flow
 
@@ -60,25 +60,21 @@ CarCheck is a web application built with Next.js, Firebase, and Gemini, designed
     *   Email and password authentication.
 *   **Dashboard (`/inspector/dashboard`):**
     *   Lists all assigned orders.
-    *   Each order displays: Order ID, Client Name, Vehicle.
     *   **Actions per order:**
-        *   **Status Selector:** A dropdown to manually set the order status ("Pendiente", "En Proceso", "Completada").
-        *   **Iniciar Inspección:** A button that navigates to the detailed inspection form (`/inspector/inspection/[orderId]`).
-        *   **Descargar Reporte:** A button (enabled only when status is "Completada") to download the final PDF report.
-*   **Inspection Form (`/inspector/inspection/[orderId]`):**
-    *   **Modern, Multi-Step Questionnaire (200+ points):**
-        *   **Sections:** Carrocería, Interior, Motor, Transmisión, Luces, Gomas, Sistemas Electrónicos, y Niveles de fluidos.
-        *   **Scoring System:** Each inspection point is rated on a scale of 1 to 5 (1=Malo, 5=Perfecto).
-        *   **Observations:** Each section includes a dedicated text area for the inspector's detailed notes and observations.
-    *   **Completion and Report Generation:**
-        *   A "Finalizar Inspección" button at the end of the form.
-        *   On click, all data (scores and observations) is collected.
-        *   **Gemini AI Integration:** The collected data is sent to the Gemini API to generate:
-            *   A concise summary of the vehicle's overall condition.
-            *   A list of future recommendations for maintenance or repair.
-        *   The generated summary and recommendations are saved with the inspection data.
-        *   The order status is automatically updated to "Completada".
-        *   The inspector is redirected back to the dashboard.
+        *   **Status Selector:** A dropdown to manually set the order status.
+        *   **Iniciar Inspección:** A button that navigates to the detailed inspection form (`/inspector/dashboard/[orderId]`).
+*   **Inspection Form (`/inspector/dashboard/[orderId]`):**
+    *   **Scoring System:** Each inspection point is rated using face emojis (😞 to 😄) representing scores from 1 to 5.
+    *   **Observations:** A text area for the inspector's detailed notes.
+    *   **Gemini AI Integration:** On submission, data is sent to the Gemini API to generate a professional report.
+
+### 5. Client Report View (`/report/[orderId]`)
+
+*   **Purpose:** A dedicated, client-facing page to display the final inspection report.
+*   **Design:** Clean, professional, and mobile-friendly layout focusing on readability.
+*   **Content:**
+    *   Displays key vehicle details (Make, Model, Year, VIN).
+    *   Presents the full, formatted report generated by Gemini, including the summary, category analysis, and recommendations.
 
 ## Integrations
 
@@ -88,15 +84,9 @@ CarCheck is a web application built with Next.js, Firebase, and Gemini, designed
     *   Storage: To store the generated PDF reports.
 *   **Gemini API:** To automatically generate inspection reports.
 *   **Google Maps API:** For vehicle location selection.
-*   **PayPal API:** For online payments.
+*   **Social Media:** WhatsApp, Instagram, and Facebook integration on the main page.
 
-## UX Considerations
+## Current Task: Bug Fixes
 
-*   **Guided Workflow:** A step-by-step process for scheduling appointments.
-*   **Form Validation:**
-    *   Valid email format.
-    *   Numeric phone number.
-    *   Correct VIN format.
-*   **Visual Feedback:** Spinners during loading and confirmations for actions.
-*   **Inspector Interface:** Clear and structured checklist for inspections.
-*   **Downloadable Reports:** Reports available in PDF format.
+*   **[Completed]** Fixed issue where the map on the vehicle information page was not loading correctly and allowed users to proceed without selecting a location.
+*   **[Completed]** Implemented dynamic pricing to ensure the correct package price is displayed on the payment and confirmation pages.

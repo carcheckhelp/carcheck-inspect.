@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { FileText, Calendar, User, Shield, Search, Car } from 'lucide-react';
+import { FileText, Calendar, User, Shield, Search, Car, MessageCircle, Instagram, Facebook } from 'lucide-react';
 
 
 const HomePage = () => {
@@ -40,6 +40,17 @@ const HomePage = () => {
         </div>
       </main>
       <footer className="w-full max-w-6xl text-center text-gray-500 mt-12">
+        <div className="flex justify-center space-x-4 mb-4">
+            <a href="https://wa.me/8093157892" target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="text-white hover:text-yellow-400" />
+            </a>
+            <a href="https://www.instagram.com/r_carcheck_d?igsh=OHVtNXFrdTJxaDFs" target="_blank" rel="noopener noreferrer">
+                <Instagram className="text-white hover:text-yellow-400" />
+            </a>
+            <a href="https://www.facebook.com/people/Carinspect/61578901386858/?rdid=G9qXGkTtpri7XpL8&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DLTX9FNet%2F" target="_blank" rel="noopener noreferrer">
+                <Facebook className="text-white hover:text-yellow-400" />
+            </a>
+        </div>
         <p>&copy; {new Date().getFullYear()} CarCheck. Todos los derechos reservados.</p>
       </footer>
     </div>

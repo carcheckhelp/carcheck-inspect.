@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -9,10 +9,20 @@ const PersonalInfoPage = () => {
   const [email, setEmail] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    const savedInfo = localStorage.getItem('personalInfo');
+    if (savedInfo) {
+      const { name, phone, email } = JSON.parse(savedInfo);
+      if (name) setName(name);
+      if (phone) setPhone(phone);
+      if (email) setEmail(email);
+    }
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Save personal info
-    console.log('Personal info:', { name, phone, email });
+    const personalInfo = { name, phone, email };
+    localStorage.setItem('personalInfo', JSON.stringify(personalInfo));
     router.push('/schedule/vehicle-info');
   };
 

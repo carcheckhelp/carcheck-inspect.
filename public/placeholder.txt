@@ -1,0 +1,1 @@
+Por favor, sube los archivos de imagen `chip.png` y `visa.png` en esta carpeta.

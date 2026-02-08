@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permitir la creación de nuevas órdenes para cualquier usuario.
+    // En producción, deberías asegurar que solo usuarios autenticados puedan escribir.
+    match /orders/{orderId} {
+      allow read, write: if true;
+    }
+
+    // Regla para cualquier otra colección (si la hubiera)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

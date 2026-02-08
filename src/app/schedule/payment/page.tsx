@@ -16,13 +16,13 @@ const PaymentPage = () => {
       const selectedPackageStr = localStorage.getItem('selectedPackage');
       const personalInfoStr = localStorage.getItem('personalInfo');
       const vehicleInfoStr = localStorage.getItem('vehicleInfo');
-      const sellerInfoStr = localStorage.getItem('sellerInfo'); // Added sellerInfo
+      const sellerInfoStr = localStorage.getItem('sellerInfo');
 
       if (selectedPackageStr && personalInfoStr && vehicleInfoStr && sellerInfoStr) {
         const selectedPackage = JSON.parse(selectedPackageStr);
         const personalInfo = JSON.parse(personalInfoStr);
         const vehicleInfo = JSON.parse(vehicleInfoStr);
-        const sellerInfo = JSON.parse(sellerInfoStr); // Added sellerInfo
+        const sellerInfo = JSON.parse(sellerInfoStr);
 
         setOrderSummary({
           selectedPackage,
@@ -71,7 +71,6 @@ const PaymentPage = () => {
         throw new Error(result.error || 'Ocurrió un error al procesar tu solicitud.');
       }
 
-      // Store the final details before redirecting
       localStorage.setItem('paymentMethod', paymentMethod);
       localStorage.setItem('orderNumber', orderNumber);
 
@@ -142,19 +141,19 @@ const PaymentPage = () => {
           {paymentMethod === 'transfer' && (
             <div className="bg-gray-800 p-4 rounded-lg text-center">
                 <p className="font-bold text-lg">Datos para la Transferencia</p>
-                <p>Banco: <span className="text-yellow-400">Banco Popular</span></p>
-                <p>Cuenta: <span className="text-yellow-400">825107128</span></p>
-                <p>A nombre de: <span className="text-yellow-400">CarCheck SRL</span></p>
+                <p>Banco: <span className="text-yellow-400">BHD</span></p>
+                <p>Cuenta: <span className="text-yellow-400">16718560011</span></p>
+                <p>A nombre de: <span className="text-yellow-400">Venecia Tavarez</span></p>
                 <p className="mt-2 text-sm">Luego de realizar la transferencia, envíe el comprobante a <span className="font-bold">pagos@carcheck.do</span></p>
             </div>
           )}
           {paymentMethod === 'paypal' && (
             <div className="bg-gray-800 p-4 rounded-lg text-center">
                  <p className="font-bold text-lg mb-4">Pagar con PayPal</p>
-                 <p className="mb-4">Será redirigido a PayPal para completar su pago de forma segura.</p>
-                 <button type="button" className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-500 transition-colors duration-300">
-                    Pagar con PayPal
-                 </button>
+                 <p className="mb-4">Será redirigido a PayPal para completar su pago de forma segura. Haga clic abajo para proceder.</p>
+                 <a href="https://www.paypal.com/paypalme/carcheck1" target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-500 transition-colors duration-300">
+                    Ir a Pagar con PayPal
+                 </a>
             </div>
           )}
           {paymentMethod === 'cash' && (
@@ -169,7 +168,7 @@ const PaymentPage = () => {
               Atrás
             </Link>
             <button type="submit" disabled={isSubmitting} className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
-              {isSubmitting ? 'Confirmando...' : (paymentMethod === 'cash' ? 'Confirmar Cita' : 'Pagar y Confirmar')}
+              {isSubmitting ? 'Confirmando...' : 'Confirmar Cita'}
             </button>
           </div>
         </form>

@@ -1,99 +1,78 @@
-
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import CustomerConfirmationEmail from '@/components/emails/CustomerConfirmationEmail';
-import InspectorNotificationEmail from '@/components/emails/InspectorNotificationEmail';
+import UnifiedEmailTemplate from '@/components/emails/UnifiedEmailTemplate';
 
-export const dynamic = 'force-dynamic'; // This is the fix!
+// Force dynamic rendering and prevent caching
+export const dynamic = 'force-dynamic';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
 const fromEmail = 'Notificaciones CarCheck <notificacion@carcheckdr.com>';
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { orderNumber, selectedPackage, personalInfo, vehicleInfo, sellerInfo } = body;
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Cuerpo de la solicitud inválido (no es JSON)' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-  // Basic validation to ensure we have the data we need
-  if (!orderNumber || !selectedPackage || !personalInfo || !vehicleInfo || !sellerInfo) {
-    return new Response(JSON.stringify({ error: "Faltan datos en la solicitud." }), {
+  // Validate that the API key is present
+  if (!process.env.RESEND_API_KEY) {
+    console.error('Error fatal: RESEND_API_KEY no está configurada en el servidor.');
+    return new Response(JSON.stringify({ error: 'Configuración del servidor incompleta.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Extract and validate essential data
+  const { orderNumber, personalInfo, vehicleInfo, sellerInfo, selectedPackage } = body;
+  if (!orderNumber || !personalInfo?.email || !vehicleInfo || !sellerInfo || !selectedPackage) {
+    return new Response(JSON.stringify({ 
+      error: 'Faltan datos esenciales en la solicitud.',
+      details: {
+        hasOrderNumber: !!orderNumber,
+        hasPersonalInfo: !!personalInfo,
+        hasVehicleInfo: !!vehicleInfo,
+        hasSellerInfo: !!sellerInfo,
+        hasSelectedPackage: !!selectedPackage
+      }
+    }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
   try {
-    // --- STEP 1: Send Customer Confirmation Email ---
-    const customerEmailData = await resend.emails.send({
+    // Send email to the customer
+    await resend.emails.send({
       from: fromEmail,
       to: [personalInfo.email],
-      subject: `✅ Confirmación de Cita - Orden #${orderNumber}`,
-      react: CustomerConfirmationEmail({
-        orderNumber,
-        packageName: selectedPackage.name,
-        price: selectedPackage.price,
-        clientName: personalInfo.name,
-        vehicleMake: vehicleInfo.make,
-        vehicleModel: vehicleInfo.model,
-        vehicleYear: parseInt(vehicleInfo.year, 10),
-        appointmentDate: vehicleInfo.appointmentDate,
-        appointmentTime: vehicleInfo.appointmentTime,
-      }),
+      subject: `✅ Confirmación de Cita CarCheck - Orden #${orderNumber}`,
+      react: UnifiedEmailTemplate({ ...body, forInspector: false }),
     });
 
-    // If customer email fails, stop and return error
-    if (customerEmailData.error) {
-      console.error("Error al enviar correo al cliente:", customerEmailData.error);
-      return new Response(JSON.stringify({ 
-        message: "Error al enviar el correo de confirmación al cliente.",
-        error: customerEmailData.error.message 
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    // --- STEP 2: Send Inspector Notification Email ---
-    const inspectorEmailData = await resend.emails.send({
+    // Send notification to the inspector
+    await resend.emails.send({
       from: fromEmail,
       to: [inspectorEmail],
       subject: `🚨 Nueva Cita de Inspección - Orden #${orderNumber}`,
-      react: InspectorNotificationEmail({
-        orderNumber,
-        packageName: selectedPackage.name,
-        price: selectedPackage.price,
-        clientName: personalInfo.name,
-        clientPhone: personalInfo.phone,
-        clientEmail: personalInfo.email,
-        sellerName: sellerInfo.sellerName,
-        sellerPhone: sellerInfo.sellerPhone,
-        vehicleMake: vehicleInfo.make,
-        vehicleModel: vehicleInfo.model,
-        vehicleYear: parseInt(vehicleInfo.year, 10),
-        vehicleVin: vehicleInfo.vin,
-        appointmentDate: vehicleInfo.appointmentDate,
-        appointmentTime: vehicleInfo.appointmentTime,
-      }),
+      react: UnifiedEmailTemplate({ ...body, forInspector: true }),
     });
 
-    // If inspector email fails, return error (but know customer email succeeded)
-    if (inspectorEmailData.error) {
-      console.error("Error al enviar correo al inspector:", inspectorEmailData.error);
-      return new Response(JSON.stringify({ 
-        message: "El correo del cliente se envió, pero falló el del inspector.",
-        error: inspectorEmailData.error.message 
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    // --- SUCCESS: Both emails were sent ---
-    return NextResponse.json({ message: "Ambos correos fueron enviados con éxito." });
+    return NextResponse.json({ message: 'Correos enviados con éxito.' });
 
   } catch (e: any) {
-    console.error("Error catastrófico en /api/send-emails:", e);
-    return new Response(JSON.stringify({ error: 'Error interno del servidor', details: e.message }), {
+    // This will now catch errors from Resend and provide a specific message
+    console.error('Error al enviar los correos desde Resend:', e);
+    return new Response(JSON.stringify({ 
+      error: 'Ocurrió un error al intentar enviar los correos.',
+      details: e.message // This is the crucial part
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

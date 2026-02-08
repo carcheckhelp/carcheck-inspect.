@@ -1,4 +1,4 @@
-import { db } from './src/lib/firebaseAdmin'; // Adjust path as needed
+import { getDb } from './src/lib/firebaseAdmin'; // CORRECT IMPORT
 
 // --- Type Definitions (copied for script self-containment) ---
 type ReportCategory = {
@@ -74,6 +74,7 @@ const reportsToSeed: Record<string, InspectionReport> = {
 
 async function seedDatabase() {
   console.log('Starting to seed database...');
+  const db = getDb(); // GET DB INSTANCE HERE
   const batch = db.batch();
 
   for (const [id, reportData] of Object.entries(reportsToSeed)) {

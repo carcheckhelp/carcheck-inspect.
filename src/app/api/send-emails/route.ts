@@ -6,7 +6,9 @@ export const dynamic = 'force-dynamic';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
-const fromEmail = 'Notificaciones CarCheck <notificacion@carcheckdr.com>';
+
+// TEMPORARY FIX: Use Resend's special address until the custom domain is verified.
+const fromEmail = 'CarCheck <onboarding@resend.dev>';
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -63,7 +65,6 @@ export async function POST(request: Request) {
 
   } catch (e: any) {
     console.error(`Catastrophic failure during inspector email send (Order #${orderNumber}):`, e);
-    // Note: At this point, the customer email was likely sent successfully.
     return new Response(JSON.stringify({ error: 'An unexpected error occurred.', details: e.message }), { status: 500 });
   }
 

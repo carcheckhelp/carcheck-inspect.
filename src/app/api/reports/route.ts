@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebaseAdmin'; // Using aliased path
 
+export const dynamic = 'force-dynamic'; // This is the fix!
+
 export async function GET() {
   try {
     const reportsSnapshot = await db.collection('reports').get();

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebaseAdmin';
 
+export const dynamic = 'force-dynamic'; // This is the fix!
+
 // This signature is required by the specific version of Next.js/Turbopack being used.
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {

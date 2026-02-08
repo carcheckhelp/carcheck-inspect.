@@ -4,6 +4,8 @@ import { Resend } from 'resend';
 import CustomerConfirmationEmail from '@/components/emails/CustomerConfirmationEmail';
 import InspectorNotificationEmail from '@/components/emails/InspectorNotificationEmail';
 
+export const dynamic = 'force-dynamic'; // This is the fix!
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
 const fromEmail = 'Notificaciones CarCheck <notificacion@carcheckdr.com>';

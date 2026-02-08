@@ -1,10 +1,19 @@
+
 import admin from 'firebase-admin';
 
-// Check if the service account environment variable is available.
-const serviceAccountString = process.env.SERVICE_ACCOUNT;
+// This function ensures the app is initialized, but only once.
+const initializeAdmin = () => {
+  if (admin.apps.length > 0) {
+    return;
+  }
 
-// Only initialize the app if the service account is available and the app has not been initialized yet.
-if (serviceAccountString && !admin.apps.length) {
+  const serviceAccountString = process.env.SERVICE_ACCOUNT;
+  if (!serviceAccountString) {
+    // This will only happen if the environment variable is missing at runtime.
+    // During build, code using this won't be executed.
+    throw new Error('SERVICE_ACCOUNT environment variable is not set.');
+  }
+
   try {
     const serviceAccount = JSON.parse(serviceAccountString);
     admin.initializeApp({
@@ -12,10 +21,13 @@ if (serviceAccountString && !admin.apps.length) {
     });
   } catch (e) {
     console.error("Firebase Admin SDK initialization error:", e);
+    throw new Error('Failed to initialize Firebase Admin SDK.');
   }
-}
+};
 
-// Export the firestore instance. If initialization failed, admin.firestore() will throw an error at runtime.
-const db = admin.firestore();
-
-export { db };
+// Export a function that returns the firestore instance.
+// This function will initialize the app on the first call.
+export const getDb = () => {
+  initializeAdmin();
+  return admin.firestore();
+};

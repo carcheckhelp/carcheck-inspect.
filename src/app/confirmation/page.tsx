@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -122,8 +121,12 @@ function ConfirmationContent() {
                 return (
                     <>
                         <CircleX className="h-16 w-16 text-red-500" />
-                        <h1 className="text-2xl font-bold mt-4">Hubo un problema</h1>
-                        <p className="text-gray-600 mt-2">No pudimos agendar tu cita. Por favor, intenta de nuevo.</p>
+                        <h1 className="text-2xl font-bold mt-4">Error en el Proceso</h1>
+                        <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-left">
+                            <p className="font-bold">Mensaje de Error Detallado:</p>
+                            <p className="text-sm font-mono mt-2">{debugMessage || 'No hay detalles de error disponibles.'}</p>
+                        </div>
+                        <p className="text-gray-500 mt-4 text-sm">Por favor, contacta a soporte con esta información.</p>
                     </>
                 );
             default:
@@ -136,12 +139,6 @@ function ConfirmationContent() {
             <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full">
                 {renderStatus()}
             </div>
-            {debugMessage && (
-                <div className="mt-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg max-w-md w-full text-sm font-mono">
-                    <p className="font-bold mb-2">Mensaje de Depuración:</p>
-                    <p>{debugMessage}</p>
-                </div>
-            )}
         </div>
     );
 }

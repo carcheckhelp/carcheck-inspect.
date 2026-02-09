@@ -10,7 +10,8 @@ const resendApiKey = HARDCODED_KEY;
 
 const resend = new Resend(resendApiKey);
 
-const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
+// Hardcoded inspector email as requested
+const inspectorEmail = 'carcheckhelp1@outlook.com';
 const fromEmail = 'CarCheck <onboarding@resend.dev>';
 
 // Helper function to add a delay

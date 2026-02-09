@@ -1,23 +1,26 @@
 import admin from 'firebase-admin';
 
-const serviceAccount = {
-  type: process.env.FIREBASE_ADMIN_TYPE,
-  project_id: process.env.FIREBASE_ADMIN_PROJECT_ID,
-  private_key_id: process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-  client_id: process.env.FIREBASE_ADMIN_CLIENT_ID,
-  auth_uri: process.env.FIREBASE_ADMIN_AUTH_URI,
-  token_uri: process.env.FIREBASE_ADMIN_TOKEN_URI,
-  auth_provider_x509_cert_url: process.env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
-  client_x509_cert_url: process.env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL,
-} as admin.ServiceAccount;
+// Check if we are in a server environment where environment variables are available
+const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
 if (!admin.apps.length) {
   try {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    if (projectId && process.env.FIREBASE_ADMIN_PRIVATE_KEY) {
+       // Initialize with service account if available (preferred for server)
+        const serviceAccount = {
+            projectId: projectId,
+            clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        };
+        
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+        });
+    } else {
+        // Fallback to application default credentials (useful for GCP/Firebase hosting)
+         admin.initializeApp();
+    }
+
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }

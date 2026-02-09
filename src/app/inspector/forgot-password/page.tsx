@@ -2,9 +2,9 @@
 
 import { useFormState, useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { sendPasswordResetEmail } from '@/app/actions';
+import { sendPasswordResetEmail, type FormState } from '@/app/actions';
 
-const initialState = {
+const initialState: FormState = {
   error: '',
   message: ''
 };

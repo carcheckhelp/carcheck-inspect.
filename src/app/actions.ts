@@ -6,6 +6,12 @@ import { auth } from '@/lib/firebase/admin';
 import { runInspectionReport } from '@/lib/gemini';
 import { updateOrderWithReport } from '@/lib/firebase/firestore';
 
+export type FormState = {
+    error?: string;
+    success?: boolean;
+    message?: string;
+};
+
 // --- Report Generation Action ---
 export async function generateInspectionReport(inspectionData: any) {
   try {
@@ -30,7 +36,7 @@ const loginSchema = z.object({
     password: z.string().min(1, "La contraseña no puede estar vacía."),
 });
 
-export async function loginInspector(prevState: any, formData: FormData) {
+export async function loginInspector(prevState: FormState, formData: FormData): Promise<FormState> {
     const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
@@ -42,19 +48,9 @@ export async function loginInspector(prevState: any, formData: FormData) {
     const { email, password } = validatedFields.data;
 
     try {
-        // Note: Firebase Admin SDK doesn't directly verify passwords.
-        // This requires a custom approach or using the client-side SDK.
-        // For this server-action flow, we'll create a session cookie.
-
-        // A proper implementation would first verify the user exists and password is correct.
-        // This is a placeholder for that logic.
-        // Since we can't directly check the password with the Admin SDK, we rely on the user being created correctly in Firebase Auth.
         const userRecord = await auth.getUserByEmail(email);
         
-        // The session cookie logic would go here. For simplicity, we'll assume success if the user exists.
-        // In a real app, you'd verify password and create a session cookie.
-        // cookies().set('session', sessionCookie, { httpOnly: true, secure: true });
-
+        // In a real app, verify password here.
         return {
             success: true,
             message: "Inicio de sesión exitoso.",
@@ -78,7 +74,7 @@ const passwordResetSchema = z.object({
     email: z.string().email("Por favor, introduce un email válido."),
 });
 
-export async function sendPasswordResetEmail(prevState: any, formData: FormData) {
+export async function sendPasswordResetEmail(prevState: FormState, formData: FormData): Promise<FormState> {
     const validatedFields = passwordResetSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
@@ -93,7 +89,6 @@ export async function sendPasswordResetEmail(prevState: any, formData: FormData)
         await auth.getUserByEmail(email); // Check if user exists
         const link = await auth.generatePasswordResetLink(email);
         
-        // Here you would email the link to the user. For now, we will log it.
         console.log("Password reset link:", link);
 
         return {
@@ -102,9 +97,8 @@ export async function sendPasswordResetEmail(prevState: any, formData: FormData)
         };
     } catch (error: any) {
         if (error.code === 'auth/user-not-found') {
-            // Don't reveal if the user exists or not for security reasons
             return {
-                success: true, // Pretend success
+                success: true, 
                 message: "Si tu correo está registrado, recibirás un enlace para restablecer la contraseña.",
             };
         }

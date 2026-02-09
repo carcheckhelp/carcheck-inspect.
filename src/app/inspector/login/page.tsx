@@ -3,10 +3,11 @@ import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { loginInspector } from '@/app/actions';
+import { loginInspector, type FormState } from '@/app/actions';
 
-const initialState = {
-  error: ''
+const initialState: FormState = {
+  error: '',
+  message: ''
 };
 
 function SubmitButton() {

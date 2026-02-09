@@ -35,7 +35,7 @@ export async function loginInspector(prevState: any, formData: FormData) {
 
     if (!validatedFields.success) {
         return {
-            error: validatedFields.error.errors.map(e => e.message).join(', '),
+            error: validatedFields.error.issues.map(e => e.message).join(', '),
         };
     }
 
@@ -83,7 +83,7 @@ export async function sendPasswordResetEmail(prevState: any, formData: FormData)
 
     if (!validatedFields.success) {
         return {
-             error: validatedFields.error.errors.map(e => e.message).join(', '),
+             error: validatedFields.error.issues.map(e => e.message).join(', '),
         };
     }
 

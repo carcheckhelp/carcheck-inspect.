@@ -19,6 +19,9 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
   // State to store inspection results: { [pointName]: status }
   // status can be 'ok', 'attention', 'fail'
   const [inspectionResults, setInspectionResults] = useState<Record<string, string>>({});
+  
+  // State to store observations per category
+  const [categoryObservations, setCategoryObservations] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -33,6 +36,9 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
         // Load existing inspection data if available
         if (data.inspectionResults) {
             setInspectionResults(data.inspectionResults);
+        }
+        if (data.categoryObservations) {
+            setCategoryObservations(data.categoryObservations);
         }
       } catch (err: any) {
         setError(err.message);
@@ -51,6 +57,13 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
     }));
   };
 
+  const handleObservationChange = (categoryId: string, observation: string) => {
+    setCategoryObservations(prev => ({
+      ...prev,
+      [categoryId]: observation
+    }));
+  };
+
   const calculateProgress = () => {
       const totalPoints = inspectionCategories.reduce((acc, cat) => acc + cat.points.length, 0);
       const completedPoints = Object.keys(inspectionResults).length;
@@ -60,10 +73,10 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
   const handleSave = async () => {
       try {
           // In a real app, send data to API
-          console.log('Saving inspection:', inspectionResults);
+          console.log('Saving inspection:', { inspectionResults, categoryObservations });
           // await fetch(`/api/inspector/inspection/${params.orderId}`, {
           //   method: 'POST',
-          //   body: JSON.stringify({ inspectionResults })
+          //   body: JSON.stringify({ inspectionResults, categoryObservations })
           // });
           alert('Inspección guardada localmente (simulación)');
       } catch (e) {
@@ -153,6 +166,21 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                    
+                    {/* Sección de Observaciones por Categoría */}
+                    <div className="mt-6 pt-4 border-t border-gray-800">
+                        <label htmlFor={`obs-${category.id}`} className="block text-sm font-medium text-gray-400 mb-2">
+                            Observaciones para {category.title} (Opcional):
+                        </label>
+                        <textarea
+                            id={`obs-${category.id}`}
+                            rows={3}
+                            className="w-full bg-black text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-colors"
+                            placeholder="Escribe aquí detalles adicionales, daños específicos, etc..."
+                            value={categoryObservations[category.id] || ''}
+                            onChange={(e) => handleObservationChange(category.id, e.target.value)}
+                        />
                     </div>
                 </div>
             ))}

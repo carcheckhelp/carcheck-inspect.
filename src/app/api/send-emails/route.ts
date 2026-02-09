@@ -4,7 +4,8 @@ import UnifiedEmailTemplate from '@/components/emails/UnifiedEmailTemplate';
 
 export const dynamic = 'force-dynamic';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY || 're_D4i96Sok_7ALptUo2e5foSv5WoTH6Fk1J';
+const resend = new Resend(resendApiKey);
 const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
 const fromEmail = 'CarCheck <onboarding@resend.dev>';
 
@@ -17,12 +18,6 @@ export async function POST(request: Request) {
       body = await request.json();
   } catch (e) {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
-  }
-
-  // --- 1. Basic Validation ---
-  if (!process.env.RESEND_API_KEY) {
-    console.error('FATAL: RESEND_API_KEY is not set on the server.');
-    return new Response(JSON.stringify({ error: 'Error del servidor: La configuración de correo no está completa.' }), { status: 500 });
   }
 
   const { orderNumber, personalInfo, vehicleInfo, selectedPackage } = body;
@@ -72,6 +67,14 @@ export async function POST(request: Request) {
 
   } catch (e: any) {
     console.error(`Catastrophic failure during email send process (Order #${orderNumber}):`, e);
+    // If it's an API key error, handle it gracefully
+    if (e.message?.includes('API key') || e.statusCode === 401) {
+         return NextResponse.json({ 
+            message: 'Error de autenticación con servicio de correos.',
+            inspectorEmailFailed: true 
+        });
+    }
+
     return new Response(JSON.stringify({ 
       error: 'Ocurrió un error inesperado durante el proceso de envío de correos.', 
       details: e.message 

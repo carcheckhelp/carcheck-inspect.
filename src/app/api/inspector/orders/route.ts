@@ -10,9 +10,14 @@ export async function GET(request: Request) {
 
     const orders = snapshot.docs.map(doc => {
         const data = doc.data();
+        // Check if name exists directly or if it's split into firstName/lastName
+        const clientName = data.personalInfo?.name 
+          ? data.personalInfo.name 
+          : `${data.personalInfo?.firstName || ''} ${data.personalInfo?.lastName || ''}`.trim();
+
         return {
             id: doc.id,
-            clientName: `${data.personalInfo?.firstName || ''} ${data.personalInfo?.lastName || ''}`,
+            clientName: clientName || 'N/A',
             vehicle: `${data.vehicleInfo?.make || 'N/A'} ${data.vehicleInfo?.model || ''} ${data.vehicleInfo?.year || ''}`,
             status: data.status || 'pending',
             createdAt: data.createdAt || new Date().toISOString()

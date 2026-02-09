@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import { MapPin, Navigation, AlertTriangle, Map as MapIcon } from 'lucide-react';
+import { MapPin, Navigation, AlertTriangle, Map as MapIcon, AlertCircle } from 'lucide-react';
 
 const containerStyle = {
   width: '100%',
@@ -32,6 +32,7 @@ const VehicleInfoPage = () => {
   const [sellerLocation, setSellerLocation] = useState('');
   const [isSunday, setIsSunday] = useState(false);
   const [recommendation, setRecommendation] = useState('');
+  const [packageError, setPackageError] = useState('');
   
   // Map State
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -134,18 +135,25 @@ const VehicleInfoPage = () => {
     }
   }, [make]);
 
+  // Validation Logic for Package vs Year
   useEffect(() => {
     const selectedPackageStr = localStorage.getItem('selectedPackage');
     if (selectedPackageStr && year) {
       const selectedPackage = JSON.parse(selectedPackageStr);
       const vehicleYear = parseInt(year, 10);
+      
+      setRecommendation('');
+      setPackageError('');
 
-      if (vehicleYear >= 2020 && (selectedPackage.name === 'Core' || selectedPackage.name === 'CarCheck Plus')) {
-        setRecommendation(`Para su vehículo del año ${vehicleYear}, se recomienda el paquete 'Pro' para un diagnóstico más completo.`);
-      } else if (vehicleYear < 2020 && selectedPackage.name === 'Pro') {
-        setRecommendation(`El paquete 'Pro' está optimizado para vehículos del 2020 en adelante. Los paquetes 'Core' o 'CarCheck Plus' pueden ser suficientes para su vehículo.`);
-      } else {
-        setRecommendation('');
+      // Validation logic
+      if (vehicleYear >= 2020) {
+          if (selectedPackage.name === 'Core' || selectedPackage.name === 'CarCheck Plus') {
+             setPackageError(`Error: El paquete '${selectedPackage.name}' no es válido para vehículos del año 2020 en adelante. Debes seleccionar el paquete 'Pro'.`);
+          }
+      } else if (vehicleYear < 2020) {
+          if (selectedPackage.name === 'Pro') {
+              setPackageError(`Error: El paquete 'Pro' es exclusivo para vehículos del año 2020 en adelante. Por favor selecciona 'Core' o 'CarCheck Plus'.`);
+          }
       }
     }
   }, [year]);
@@ -211,6 +219,11 @@ const VehicleInfoPage = () => {
         alert("No se pueden programar citas los domingos. Por favor, elija otro día.");
         return;
     }
+
+    if (packageError) {
+        alert("Por favor corrige la selección del paquete o el año del vehículo antes de continuar.");
+        return;
+    }
     
     const vehicleInfo = { make, model, vin, year, appointmentDate: date, appointmentTime: time };
     localStorage.setItem('vehicleInfo', JSON.stringify(vehicleInfo));
@@ -260,7 +273,19 @@ const VehicleInfoPage = () => {
           <div className="mb-4">
             <label htmlFor="year" className="block text-lg font-bold mb-2">Año</label>
             <input type="number" id="year" value={year} onChange={(e) => setYear(e.target.value)} className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required />
-            {recommendation && <p className="text-sm text-yellow-400 mt-2">{recommendation}</p>}
+            
+            {/* Error / Recommendation Display */}
+            {packageError && (
+                <div className="mt-2 p-3 bg-red-900/50 border border-red-500 rounded text-red-200 text-sm flex items-start gap-2">
+                    <AlertCircle className="shrink-0 mt-0.5" size={16} />
+                    <div>
+                        <p>{packageError}</p>
+                        <Link href="/schedule/package" className="underline font-bold mt-1 block hover:text-white">
+                            Cambiar Paquete
+                        </Link>
+                    </div>
+                </div>
+            )}
           </div>
 
           <h3 className="text-2xl font-bold mt-8 mb-4 text-center">Información de la Cita</h3>
@@ -411,7 +436,11 @@ const VehicleInfoPage = () => {
             <Link href="/schedule/personal-info" className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">
               Atrás
             </Link>
-            <button type="submit" disabled={!sellerLocation} className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+            <button 
+                type="submit" 
+                disabled={!sellerLocation || !!packageError} 
+                className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Siguiente
             </button>
           </div>

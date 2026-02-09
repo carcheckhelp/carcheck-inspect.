@@ -4,8 +4,10 @@ import UnifiedEmailTemplate from '@/components/emails/UnifiedEmailTemplate';
 
 export const dynamic = 'force-dynamic';
 
-// Use the provided key if env var is missing
-const resendApiKey = process.env.RESEND_API_KEY || 're_D4i96Sok_7ALptUo2e5foSv5WoTH6Fk1J';
+// FORCE USE OF PROVIDED KEY to rule out environment variable issues
+const HARDCODED_KEY = 're_D4i96Sok_7ALptUo2e5foSv5WoTH6Fk1J';
+const resendApiKey = HARDCODED_KEY; 
+
 const resend = new Resend(resendApiKey);
 
 const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
@@ -38,6 +40,16 @@ export async function POST(request: Request) {
 
     if (customerEmailResult.error) {
         console.error(`CRITICAL FAILURE: Could not send customer email (Order #${orderNumber}).`, customerEmailResult.error);
+        
+        // Check specifically for API key error
+        if (customerEmailResult.error.message?.includes('API key')) {
+             return NextResponse.json({ 
+                message: 'Error de configuración de API Key (Correo omitido para permitir flujo).',
+                inspectorEmailFailed: true,
+                errorDetails: customerEmailResult.error.message
+            });
+        }
+
         return new Response(JSON.stringify({ 
             error: 'No se pudo enviar el correo de confirmación. Por favor verifica tu email.',
             details: customerEmailResult.error.message

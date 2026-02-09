@@ -65,7 +65,12 @@ const InspectorLoginPage = () => {
           <SubmitButton />
         </form>
         <div className="mt-6 text-center">
-          <Link href="/" className="text-yellow-500 hover:underline">
+          <Link href="/inspector/forgot-password" className="text-sm text-yellow-500 hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+        <div className="mt-4 text-center">
+          <Link href="/" className="text-gray-400 hover:underline">
             Volver al Inicio
           </Link>
         </div>

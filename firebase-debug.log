@@ -1491,3 +1491,223 @@
 [debug] [2026-02-08T14:46:19.455Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/carcheck-inspect/locations/us-east4/backends/carcheck-inspect-app/traffic {"name":"projects/carcheck-inspect/locations/us-east4/backends/carcheck-inspect-app/traffic","rolloutPolicy":{"codebaseBranch":"main"},"reconciling":false,"createTime":"2026-02-06T01:09:22.318056852Z","updateTime":"2026-02-06T01:09:21.297579Z","etag":"qH6d8aRBbl1lpRvt0GwU4Ov7nSbRj6DoDqlnnoqhbks","uid":"7eb88756-f498-423f-9205-f4562ff38d11","current":{"splits":[{"build":"projects/787597042368/locations/us-east4/backends/carcheck-inspect-app/builds/build-2026-02-06-002","percent":100}]}}
 [debug] [2026-02-08T14:46:19.484Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/carcheck-inspect/locations/us-east4/backends/carcheck-inspect-app/domains 200
 [debug] [2026-02-08T14:46:19.484Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/carcheck-inspect/locations/us-east4/backends/carcheck-inspect-app/domains {"domains":[{"name":"projects/carcheck-inspect/locations/us-east4/backends/carcheck-inspect-app/domains/carcheckdr.com","createTime":"2026-02-07T15:53:34.174173460Z","updateTime":"2026-02-07T15:53:33.220823242Z","type":"CUSTOM","customDomainStatus":{"hostState":"HOST_ACTIVE","ownershipState":"OWNERSHIP_ACTIVE","certState":"CERT_ACTIVE"},"reconciling":false,"uid":"b38d45ea-93d1-4f71-8e40-0175358ac4f0","etag":"pSI3ZYObeoYS8Shtb14cg4pxRZZ4Y9UIHZsItiOcXZc"},{"name":"projects/carcheck-inspect/locations/us-east4/backends/carcheck-inspect-app/domains/carcheck-inspect-app--carcheck-inspect.us-east4.hosted.app","createTime":"2026-02-06T01:09:21.346111718Z","updateTime":"2026-02-06T01:09:21.297579Z","type":"DEFAULT","reconciling":false,"uid":"ea5a8661-0f2c-429d-a219-e1f81c2a322f","etag":"GWXc6ZBaPEYhp9uXdFR6TJdTOiu2_GoDMzDjugiC7_o"}]}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T17:21:05.877Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T17:21:05.877Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T17:21:05.880Z] Checked if tokens are valid: false, expires at: 1770564389693
+[debug] [2026-02-08T17:21:05.880Z] Checked if tokens are valid: false, expires at: 1770564389693
+[debug] [2026-02-08T17:21:05.880Z] > refreshing access token with scopes: []
+[debug] [2026-02-08T17:21:05.890Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-08T17:21:05.891Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-08T17:21:06.034Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-08T17:21:06.034Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-08T17:21:06.085Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-08T17:21:06.188Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T17:21:06.188Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T17:21:06.206Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T17:21:06.206Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T17:21:06.735Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T17:21:06.736Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T17:21:06.736Z] Checked if tokens are valid: true, expires at: 1770574865035
+[debug] [2026-02-08T17:21:06.736Z] Checked if tokens are valid: true, expires at: 1770574865035
+[debug] [2026-02-08T17:21:06.736Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T17:21:06.749Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T17:21:06.749Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T17:21:06.750Z] Checked if tokens are valid: true, expires at: 1770574865035
+[debug] [2026-02-08T17:21:06.750Z] Checked if tokens are valid: true, expires at: 1770574865035
+[debug] [2026-02-08T17:21:06.750Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-08T17:21:06.800Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T17:21:06.802Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T17:21:06.804Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T17:21:06.812Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T17:21:06.834Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T17:21:06.834Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T17:21:06.836Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T17:21:06.836Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:06.992Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:06.993Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T20:18:06.995Z] Checked if tokens are valid: false, expires at: 1770574865035
+[debug] [2026-02-08T20:18:06.995Z] Checked if tokens are valid: false, expires at: 1770574865035
+[debug] [2026-02-08T20:18:06.995Z] > refreshing access token with scopes: []
+[debug] [2026-02-08T20:18:06.998Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-08T20:18:06.999Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.060Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.061Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T20:18:07.061Z] Checked if tokens are valid: false, expires at: 1770574865035
+[debug] [2026-02-08T20:18:07.061Z] Checked if tokens are valid: false, expires at: 1770574865035
+[debug] [2026-02-08T20:18:07.061Z] > refreshing access token with scopes: []
+[debug] [2026-02-08T20:18:07.062Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-08T20:18:07.062Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-08T20:18:07.113Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-08T20:18:07.114Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-08T20:18:07.136Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-08T20:18:07.139Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-08T20:18:07.139Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-08T20:18:07.152Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-08T20:18:07.223Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T20:18:07.226Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[debug] [2026-02-08T20:18:07.240Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.240Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.258Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.258Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.258Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [none]
+[debug] [2026-02-08T20:18:07.258Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-08T20:18:07.260Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [none]
+[debug] [2026-02-08T20:18:07.260Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-08T20:18:07.345Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T20:18:07.348Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[debug] [2026-02-08T20:18:07.350Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.350Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.362Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.362Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.362Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [none]
+[debug] [2026-02-08T20:18:07.362Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-08T20:18:07.365Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [none]
+[debug] [2026-02-08T20:18:07.365Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-08T20:18:07.414Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com 403
+[debug] [2026-02-08T20:18:07.414Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [omitted]
+[debug] [2026-02-08T20:18:07.426Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com 200
+[debug] [2026-02-08T20:18:07.427Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2026-02-08T20:18:07.465Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com 403
+[debug] [2026-02-08T20:18:07.465Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [omitted]
+[debug] [2026-02-08T20:18:07.503Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com 200
+[debug] [2026-02-08T20:18:07.504Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.511Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.512Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T20:18:07.516Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.516Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.516Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-08T20:18:07.582Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T20:18:07.582Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.589Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.589Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.617Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.618Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T20:18:07.618Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.622Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.622Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.632Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.632Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T20:18:07.632Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.632Z] Checked if tokens are valid: true, expires at: 1770585486139
+[debug] [2026-02-08T20:18:07.632Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-08T20:18:07.820Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T20:18:07.820Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.832Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.833Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-08T20:18:07.847Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-08T20:18:07.848Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-08T20:18:07.855Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-08T20:18:07.855Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-09T13:19:32.071Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-09T13:19:32.073Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-09T13:19:32.074Z] Checked if tokens are valid: false, expires at: 1770585486139
+[debug] [2026-02-09T13:19:32.075Z] Checked if tokens are valid: false, expires at: 1770585486139
+[debug] [2026-02-09T13:19:32.076Z] > refreshing access token with scopes: []
+[debug] [2026-02-09T13:19:32.079Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-09T13:19:32.079Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-09T13:19:32.120Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-09T13:19:32.121Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-09T13:19:32.121Z] Checked if tokens are valid: false, expires at: 1770585486139
+[debug] [2026-02-09T13:19:32.121Z] Checked if tokens are valid: false, expires at: 1770585486139
+[debug] [2026-02-09T13:19:32.121Z] > refreshing access token with scopes: []
+[debug] [2026-02-09T13:19:32.122Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-09T13:19:32.122Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-09T13:19:32.182Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-09T13:19:32.182Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-09T13:19:32.208Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-09T13:19:32.224Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-09T13:19:32.225Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-09T13:19:32.245Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-09T13:19:32.317Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-09T13:19:32.320Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[debug] [2026-02-09T13:19:32.349Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.349Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.392Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.392Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.393Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [none]
+[debug] [2026-02-09T13:19:32.393Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-09T13:19:32.397Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [none]
+[debug] [2026-02-09T13:19:32.397Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-09T13:19:32.581Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-09T13:19:32.582Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[debug] [2026-02-09T13:19:32.587Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.587Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.618Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.619Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.619Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [none]
+[debug] [2026-02-09T13:19:32.619Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-09T13:19:32.624Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [none]
+[debug] [2026-02-09T13:19:32.624Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com  x-goog-user-project=carcheck-inspect
+[debug] [2026-02-09T13:19:32.764Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com 403
+[debug] [2026-02-09T13:19:32.764Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [omitted]
+[debug] [2026-02-09T13:19:32.809Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com 403
+[debug] [2026-02-09T13:19:32.811Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebaseio.com [omitted]
+[debug] [2026-02-09T13:19:32.824Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com 200
+[debug] [2026-02-09T13:19:32.824Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-09T13:19:32.845Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-09T13:19:32.845Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-09T13:19:32.845Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.846Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.846Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-09T13:19:32.904Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 429
+[debug] [2026-02-09T13:19:32.910Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"error":{"code":429,"message":"Quota exceeded for quota metric 'All requests' and limit 'All requests per minute' of service 'cloudbilling.googleapis.com' for consumer 'project_number:563584335869'.","status":"RESOURCE_EXHAUSTED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"RATE_LIMIT_EXCEEDED","domain":"googleapis.com","metadata":{"quota_location":"global","service":"cloudbilling.googleapis.com","quota_metric":"cloudbilling.googleapis.com/standard_quota","quota_limit_value":"400","consumer":"projects/563584335869","quota_limit":"StandardQuotaPerMinutePerProject","quota_unit":"1/min/{project}"}},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Request a higher quota limit.","url":"https://cloud.google.com/docs/quotas/help/request_increase"}]}]}}
+[debug] [2026-02-09T13:19:32.919Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com 200
+[debug] [2026-02-09T13:19:32.923Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/carcheck-inspect/services/firebasedataconnect.googleapis.com [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-09T13:19:32.987Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-09T13:19:32.987Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-09T13:19:32.987Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-09T13:19:32.987Z] > authorizing via signed-in user (andhersonr111@gmail.com)
+[debug] [2026-02-09T13:19:32.987Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.987Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.988Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.988Z] Checked if tokens are valid: true, expires at: 1770646771225
+[debug] [2026-02-09T13:19:32.988Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-09T13:19:32.989Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo [none]
+[debug] [2026-02-09T13:19:33.025Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 429
+[debug] [2026-02-09T13:19:33.026Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"error":{"code":429,"message":"Quota exceeded for quota metric 'All requests' and limit 'All requests per minute' of service 'cloudbilling.googleapis.com' for consumer 'project_number:563584335869'.","status":"RESOURCE_EXHAUSTED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"RATE_LIMIT_EXCEEDED","domain":"googleapis.com","metadata":{"consumer":"projects/563584335869","service":"cloudbilling.googleapis.com","quota_limit":"StandardQuotaPerMinutePerProject","quota_limit_value":"400","quota_unit":"1/min/{project}","quota_location":"global","quota_metric":"cloudbilling.googleapis.com/standard_quota"}},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Request a higher quota limit.","url":"https://cloud.google.com/docs/quotas/help/request_increase"}]}]}}
+[debug] [2026-02-09T13:19:33.057Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo 200
+[debug] [2026-02-09T13:19:33.062Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/carcheck-inspect/billingInfo {"name":"projects/carcheck-inspect/billingInfo","projectId":"carcheck-inspect","billingAccountName":"billingAccounts/01157D-B5E469-37F11F","billingEnabled":true}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-02-09T13:19:33.080Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-02-09T13:19:33.080Z] > authorizing via signed-in user (andhersonr111@gmail.com)

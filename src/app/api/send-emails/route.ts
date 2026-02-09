@@ -6,68 +6,75 @@ export const dynamic = 'force-dynamic';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const inspectorEmail = process.env.INSPECTOR_EMAIL || 'carcheckhelp1@outlook.com';
-
-// TEMPORARY FIX: Use Resend's special address until the custom domain is verified.
 const fromEmail = 'CarCheck <onboarding@resend.dev>';
 
+// Helper function to add a delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body;
+  try {
+      body = await request.json();
+  } catch (e) {
+      return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+  }
 
   // --- 1. Basic Validation ---
   if (!process.env.RESEND_API_KEY) {
     console.error('FATAL: RESEND_API_KEY is not set on the server.');
-    return new Response(JSON.stringify({ error: 'Server configuration incomplete.' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Error del servidor: La configuración de correo no está completa.' }), { status: 500 });
   }
 
-  const { orderNumber, personalInfo, vehicleInfo, sellerInfo, selectedPackage } = body;
+  const { orderNumber, personalInfo, vehicleInfo, selectedPackage } = body;
   if (!orderNumber || !personalInfo?.email || !vehicleInfo || !selectedPackage) {
-    return new Response(JSON.stringify({ error: 'Missing essential data in the request.' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Faltan datos esenciales en la solicitud.' }), { status: 400 });
   }
 
-  // --- 2. Send Customer Email & CHECK RESPONSE ---
   try {
-    const { data, error } = await resend.emails.send({
+    // --- 2. Send Customer Email (First) ---
+    const customerEmailResult = await resend.emails.send({
       from: fromEmail,
       to: [personalInfo.email],
       subject: `✅ Confirmación de Cita CarCheck - Orden #${orderNumber}`,
       react: UnifiedEmailTemplate({ ...body, forInspector: false }),
     });
 
-    if (error) {
-      console.error(`Resend failed to send customer email (Order #${orderNumber}):`, error);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to send customer confirmation email.',
-        details: error.message 
-      }), { status: 500 });
+    if (customerEmailResult.error) {
+        console.error(`CRITICAL FAILURE: Could not send customer email (Order #${orderNumber}).`, customerEmailResult.error);
+        return new Response(JSON.stringify({ 
+            error: 'No se pudo enviar el correo de confirmación. Por favor verifica tu email.',
+            details: customerEmailResult.error.message
+        }), { status: 500 });
     }
 
-  } catch (e: any) {
-    console.error(`Catastrophic failure during customer email send (Order #${orderNumber}):`, e);
-    return new Response(JSON.stringify({ error: 'An unexpected error occurred.', details: e.message }), { status: 500 });
-  }
+    // --- 3. Wait to avoid Rate Limits ---
+    // Resend free tier has a rate limit (e.g. 2 req/sec). We wait 1.5 seconds to be safe.
+    await delay(1500);
 
-  // --- 3. Send Inspector Email & CHECK RESPONSE ---
-  try {
-    const { data, error } = await resend.emails.send({
+    // --- 4. Send Inspector Email (Second) ---
+    const inspectorEmailResult = await resend.emails.send({
       from: fromEmail,
       to: [inspectorEmail],
       subject: `🚨 Nueva Cita de Inspección - Orden #${orderNumber}`,
       react: UnifiedEmailTemplate({ ...body, forInspector: true }),
     });
 
-    if (error) {
-      console.error(`Resend failed to send inspector email (Order #${orderNumber}):`, error);
-      return new Response(JSON.stringify({ 
-        error: 'Customer email sent, but failed to send inspector notification.',
-        details: error.message 
-      }), { status: 500 });
+    if (inspectorEmailResult.error) {
+        console.warn(`WARNING: Customer email sent, but INSPECTOR email failed (Order #${orderNumber}).`, inspectorEmailResult.error);
+        // We log the error but do NOT fail the request, as the user has received their confirmation.
     }
 
-  } catch (e: any) {
-    console.error(`Catastrophic failure during inspector email send (Order #${orderNumber}):`, e);
-    return new Response(JSON.stringify({ error: 'An unexpected error occurred.', details: e.message }), { status: 500 });
-  }
+    // --- 5. Success --- 
+    return NextResponse.json({ 
+        message: 'Proceso de correos finalizado.',
+        inspectorEmailFailed: !!inspectorEmailResult.error 
+    });
 
-  // --- 4. Success --- 
-  return NextResponse.json({ message: 'Emails sent successfully.' });
+  } catch (e: any) {
+    console.error(`Catastrophic failure during email send process (Order #${orderNumber}):`, e);
+    return new Response(JSON.stringify({ 
+      error: 'Ocurrió un error inesperado durante el proceso de envío de correos.', 
+      details: e.message 
+    }), { status: 500 });
+  }
 }

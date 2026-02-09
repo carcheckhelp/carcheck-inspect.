@@ -28,43 +28,51 @@ const PaymentPage = () => {
           sellerInfo: JSON.parse(sellerInfoStr),
         });
       } else {
-        setError("Información de la orden no encontrada. Por favor, reinicia el proceso.");
+        // If data is missing, redirect to start (or show error)
+        // For now, show error
+        console.error("Missing data in localStorage");
+        setError("Faltan datos de la orden. Por favor, reinicie el proceso.");
       }
     } catch (e) {
       console.error(e);
-      setError("Error al cargar el resumen de la orden.");
+      setError("Error al cargar los datos.");
     } finally {
       setIsLoading(false);
     }
   }, []);
-
-  const generateOrderNumber = () => {
-    const prefix = 'CC';
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `${prefix}-${timestamp}-${randomPart}`;
-  };
 
   const handleConfirmation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderSummary) return;
 
     setIsSubmitting(true);
-    setError(null);
 
-    const orderNumber = generateOrderNumber();
+    // Construct the full appointment data object
+    const appointmentData = {
+        ...orderSummary,
+        paymentMethod,
+        createdAt: new Date().toISOString(),
+        status: 'pending', // Initial status
+    };
 
-    // Store final details in localStorage to be used on the confirmation page
-    localStorage.setItem('paymentMethod', paymentMethod);
-    localStorage.setItem('orderNumber', orderNumber);
+    // Save to localStorage for the Confirmation Page to pick up
+    localStorage.setItem('appointmentData', JSON.stringify(appointmentData));
 
-    // For a better user experience, navigate to confirmation page immediately.
-    // The email sending will be triggered from the confirmation page.
-    router.push('/schedule/confirmation');
+    // Navigate to confirmation page
+    router.push('/confirmation'); // Note: changed from /schedule/confirmation to /confirmation based on file list
   };
 
   if (isLoading) {
     return <div className="min-h-screen bg-black text-white flex items-center justify-center"><p>Cargando...</p></div>;
+  }
+
+  if (error) {
+      return (
+        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
+            <p className="text-red-500 text-xl">{error}</p>
+            <Link href="/schedule/package" className="mt-4 bg-yellow-500 text-black px-4 py-2 rounded">Reiniciar</Link>
+        </div>
+      );
   }
 
   return (
@@ -78,71 +86,105 @@ const PaymentPage = () => {
         </Link>
       </header>
 
-      <main className="w-full max-w-2xl bg-gray-900 p-8 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold mb-6 text-center">Finalizar Pago</h2>
+      <main className="w-full max-w-2xl bg-gray-900 p-8 rounded-lg shadow-lg mt-20 md:mt-0">
+        <h2 className="text-3xl font-bold mb-6 text-center">Resumen y Pago</h2>
 
-        {error && (
-          <div className="bg-red-900 border border-red-700 text-red-200 p-4 rounded-lg mb-6 text-center">
-            <p className="font-bold">Error</p>
-            <p>{error}</p>
-          </div>
-        )}
-
-        {orderSummary && (
-          <div className="bg-gray-800 p-6 rounded-lg mb-8">
-            <h3 className="text-2xl font-bold mb-4 text-yellow-400">Resumen de la Orden</h3>
-            <div className="space-y-3 text-lg">
-              <p><span className="font-bold text-gray-400">Paquete:</span> {orderSummary.selectedPackage.name}</p>
-              <p><span className="font-bold text-gray-400">Precio:</span> ${orderSummary.selectedPackage.price.toLocaleString()}</p>
-              {/* More details... */}
+        {/* Order Summary Display */}
+        <div className="bg-gray-800 p-6 rounded-lg mb-8 border border-gray-700">
+            <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-gray-600 pb-2">Resumen de la Orden</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p className="text-gray-400">Paquete:</p>
+                    <p className="font-semibold text-white">{orderSummary.selectedPackage.name}</p>
+                </div>
+                <div>
+                    <p className="text-gray-400">Precio:</p>
+                    <p className="font-semibold text-yellow-400">${orderSummary.selectedPackage.price.toLocaleString()}</p>
+                </div>
+                <div>
+                    <p className="text-gray-400">Vehículo:</p>
+                    <p className="font-semibold text-white">{orderSummary.vehicleInfo.year} {orderSummary.vehicleInfo.make} {orderSummary.vehicleInfo.model}</p>
+                </div>
+                <div>
+                    <p className="text-gray-400">Fecha Cita:</p>
+                    <p className="font-semibold text-white">{orderSummary.vehicleInfo.appointmentDate} - {orderSummary.vehicleInfo.appointmentTime}</p>
+                </div>
             </div>
-          </div>
-        )}
+        </div>
 
         <form onSubmit={handleConfirmation}>
-          <div className="mb-6">
-            <h3 className="text-xl font-bold mb-4">Método de Pago</h3>
-            <div className="flex rounded-lg border border-gray-700 overflow-hidden">
-              <button type="button" onClick={() => setPaymentMethod('transfer')} className={`flex-1 p-3 font-bold transition-colors duration-300 ${paymentMethod === 'transfer' ? 'bg-yellow-500 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}>Transferencia</button>
-              <button type="button" onClick={() => setPaymentMethod('paypal')} className={`flex-1 p-3 font-bold transition-colors duration-300 ${paymentMethod === 'paypal' ? 'bg-yellow-500 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}>PayPal</button>
-              <button type="button" onClick={() => setPaymentMethod('cash')} className={`flex-1 p-3 font-bold transition-colors duration-300 ${paymentMethod === 'cash' ? 'bg-yellow-500 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}>Efectivo</button>
+          <div className="mb-8">
+            <h3 className="text-xl font-bold mb-4">Selecciona Método de Pago</h3>
+            
+            <div className="grid grid-cols-3 gap-2 mb-6">
+                <button 
+                    type="button" 
+                    onClick={() => setPaymentMethod('transfer')} 
+                    className={`p-3 rounded-lg font-bold text-sm md:text-base transition-all ${paymentMethod === 'transfer' ? 'bg-yellow-500 text-black ring-2 ring-yellow-300' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+                >
+                    Transferencia
+                </button>
+                <button 
+                    type="button" 
+                    onClick={() => setPaymentMethod('paypal')} 
+                    className={`p-3 rounded-lg font-bold text-sm md:text-base transition-all ${paymentMethod === 'paypal' ? 'bg-yellow-500 text-black ring-2 ring-yellow-300' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+                >
+                    PayPal
+                </button>
+                <button 
+                    type="button" 
+                    onClick={() => setPaymentMethod('cash')} 
+                    className={`p-3 rounded-lg font-bold text-sm md:text-base transition-all ${paymentMethod === 'cash' ? 'bg-yellow-500 text-black ring-2 ring-yellow-300' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+                >
+                    Efectivo
+                </button>
             </div>
+
+            {/* Payment Details Sections */}
+            {paymentMethod === 'transfer' && (
+                <div className="bg-gray-800 p-5 rounded-lg border border-gray-700 animate-fadeIn">
+                    <p className="font-bold text-lg mb-2 text-center text-yellow-400">Datos Bancarios</p>
+                    <div className="space-y-2 text-center">
+                        <p>Banco: <span className="font-bold text-white">BHD</span></p>
+                        <p>Cuenta: <span className="font-bold text-white tracking-wider">16718560011</span></p>
+                        <p>Beneficiario: <span className="font-bold text-white">Venecia Tavarez</span></p>
+                    </div>
+                    <div className="mt-4 text-xs text-gray-400 text-center bg-gray-900 p-3 rounded">
+                        <p className="mb-1">Enviar comprobante a:</p>
+                        <p className="font-mono text-yellow-500">carcheckhelp1@outlook.com</p>
+                        <p className="mt-1 flex justify-center items-center gap-1">
+                            <FaWhatsapp className="text-green-500"/> <span>809-315-7892</span>
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {paymentMethod === 'paypal' && (
+                <div className="bg-gray-800 p-5 rounded-lg border border-gray-700 text-center animate-fadeIn">
+                    <p className="mb-4 text-gray-300">Para completar su pago de forma segura vía PayPal:</p>
+                    <a href="https://www.paypal.com/paypalme/carcheck1" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#0070ba] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#003087] transition-colors">
+                        Pagar con PayPal
+                    </a>
+                    <p className="mt-4 text-xs text-gray-500">Luego de pagar, presione "Confirmar Cita" abajo.</p>
+                </div>
+            )}
+
+            {paymentMethod === 'cash' && (
+                <div className="bg-gray-800 p-5 rounded-lg border border-gray-700 text-center animate-fadeIn">
+                    <p className="text-gray-300">El pago se realizará en efectivo directamente al inspector al momento de la revisión.</p>
+                </div>
+            )}
           </div>
 
-          {paymentMethod === 'transfer' && (
-            <div className="bg-gray-800 p-4 rounded-lg text-center">
-              <p className="font-bold text-lg">Datos para la Transferencia</p>
-              <p>Banco: <span className="text-yellow-400">BHD</span></p>
-              <p>Cuenta: <span className="text-yellow-400">16718560011</span></p>
-              <p>A nombre de: <span className="text-yellow-400">Venecia Tavarez</span></p>
-              <p className="mt-2 text-sm">Luego de realizar la transferencia, envíe el comprobante al email <span className="font-bold">carcheckhelp1@outlook.com</span> o al WhatsApp:</p>
-              <div className="flex items-center justify-center mt-2">
-                <FaWhatsapp className="text-green-500 mr-2" />
-                <span className="font-bold text-yellow-400">809-315-7892</span>
-              </div>
-            </div>
-          )}
-          {paymentMethod === 'paypal' && (
-            <div className="bg-gray-800 p-4 rounded-lg text-center">
-              <p className="font-bold text-lg mb-4">Pagar con PayPal</p>
-              <p className="mb-4">Haga clic abajo para ir a PayPal y realizar el pago. Luego, regrese a esta página y haga clic en 'Confirmar Cita' para finalizar.</p>
-              <a href="https://www.paypal.com/paypalme/carcheck1" target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-500 transition-colors duration-300">
-                Ir a Pagar con PayPal
-              </a>
-            </div>
-          )}
-          {paymentMethod === 'cash' && (
-            <div className="bg-gray-800 p-4 rounded-lg text-center">
-              <p className="font-bold text-lg">Pago en Efectivo</p>
-              <p>El pago se realizará en efectivo al momento de la inspección del vehículo.</p>
-            </div>
-          )}
-
-          <div className="flex justify-between mt-8">
-            <Link href="/schedule/vehicle-info" className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">
-              Atrás
+          <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-700">
+            <Link href="/schedule/vehicle-info" className="text-gray-400 hover:text-white transition-colors underline">
+              Volver atrás
             </Link>
-            <button type="submit" disabled={isSubmitting} className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
+            <button 
+                type="submit" 
+                disabled={isSubmitting} 
+                className="bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg hover:bg-yellow-400 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-yellow-500/20"
+            >
               {isSubmitting ? 'Procesando...' : 'Confirmar Cita'}
             </button>
           </div>

@@ -1,7 +1,24 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { MapPin, Navigation, Search, AlertTriangle, Map as MapIcon } from 'lucide-react';
+
+const containerStyle = {
+  width: '100%',
+  height: '350px',
+  borderRadius: '0.5rem'
+};
+
+const defaultCenter = {
+  lat: 19.4517, // Santiago de los Caballeros
+  lng: -70.6970
+};
+
+// Libraries must be defined outside to avoid re-renders. 
+// We keep 'places' in case we add other features later, but it's not strictly needed for just the map/pin.
+const libraries: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ["places"];
 
 const VehicleInfoPage = () => {
   const [make, setMake] = useState('');
@@ -13,9 +30,40 @@ const VehicleInfoPage = () => {
   const [time, setTime] = useState('');
   const [sellerName, setSellerName] = useState('');
   const [sellerPhone, setSellerPhone] = useState('');
+  const [sellerLocation, setSellerLocation] = useState('');
   const [isSunday, setIsSunday] = useState(false);
   const [recommendation, setRecommendation] = useState('');
+  
+  // Map State
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [markerPosition, setMarkerPosition] = useState<google.maps.LatLngLiteral | null>(null);
+  
+  // Error handling state
+  const [mapError, setMapError] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
+
   const router = useRouter();
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    libraries: libraries,
+  });
+
+  // Catch Google Maps Auth Failure (The "Oops" error)
+  useEffect(() => {
+      // Define the global function that Google Maps calls on auth failure
+      (window as any).gm_authFailure = () => {
+          console.error("Google Maps Authentication Error detected.");
+          setMapError(true);
+      };
+
+      return () => {
+          // Cleanup
+          (window as any).gm_authFailure = undefined;
+      };
+  }, []);
 
   const carBrands = [
     'Ford', 'Chevrolet', 'Dodge', 'Jeep', 'Ram', 'Cadillac', 'Chrysler', 'Tesla',
@@ -54,6 +102,7 @@ const VehicleInfoPage = () => {
     MG: ['MG ZS', 'MG HS', 'MG 4', 'MG 5', 'MG GT'],
   };
 
+
   const timeSlots = [
     '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
     '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
@@ -72,6 +121,7 @@ const VehicleInfoPage = () => {
     if (savedSellerInfo) {
       setSellerName(savedSellerInfo.sellerName || '');
       setSellerPhone(savedSellerInfo.sellerPhone || '');
+      setSellerLocation(savedSellerInfo.sellerLocation || '');
     }
   }, []);
 
@@ -111,6 +161,49 @@ const VehicleInfoPage = () => {
     }
   };
 
+  const onLoadMap = useCallback((map: google.maps.Map) => {
+      setMap(map);
+  }, []);
+
+  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+      if (e.latLng) {
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
+          setMarkerPosition({ lat, lng });
+          const link = `https://www.google.com/maps?q=${lat},${lng}`;
+          setSellerLocation(link);
+      }
+  }, []);
+
+  const handleGetLocation = () => {
+      if (navigator.geolocation) {
+          const btn = document.getElementById('getLocationBtnFallback') || document.getElementById('getLocationBtn');
+          if(btn) btn.innerText = "Buscando...";
+
+          navigator.geolocation.getCurrentPosition(
+              (position) => {
+                  const { latitude, longitude } = position.coords;
+                  setMapCenter({ lat: latitude, lng: longitude });
+                  setMarkerPosition({ lat: latitude, lng: longitude });
+                  
+                  const link = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                  setSellerLocation(link);
+                  
+                  if(btn) btn.innerText = "Ubicación Actualizada";
+                  setTimeout(() => { 
+                      if(btn) btn.innerText = "Usar mi ubicación actual (GPS)"; 
+                  }, 2000);
+              },
+              (error) => {
+                  alert("Error obteniendo ubicación. Asegúrate de permitir el acceso.");
+                  if(btn) btn.innerText = "Usar mi ubicación actual (GPS)";
+              }
+          );
+      } else {
+          alert("Tu navegador no soporta geolocalización.");
+      }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isSunday) {
@@ -121,11 +214,14 @@ const VehicleInfoPage = () => {
     const vehicleInfo = { make, model, vin, year, appointmentDate: date, appointmentTime: time };
     localStorage.setItem('vehicleInfo', JSON.stringify(vehicleInfo));
 
-    const sellerInfo = { sellerName, sellerPhone };
+    const sellerInfo = { sellerName, sellerPhone, sellerLocation };
     localStorage.setItem('sellerInfo', JSON.stringify(sellerInfo));
 
     router.push('/schedule/payment');
   };
+
+  // Determine if we should show the fallback UI
+  const showFallback = loadError || mapError || manualMode;
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
@@ -140,6 +236,7 @@ const VehicleInfoPage = () => {
       <main className="w-full max-w-lg bg-gray-900 p-8 rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold mb-6 text-center">Datos del Vehículo y Vendedor</h2>
         <form onSubmit={handleSubmit}>
+          {/* ... Vehicle Data Fields ... */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="mb-4">
               <label htmlFor="make" className="block text-lg font-bold mb-2">Marca</label>
@@ -194,11 +291,121 @@ const VehicleInfoPage = () => {
             </div>
           </div>
 
+          <div className="mb-8">
+              <div className="flex justify-between items-center mb-2">
+                  <label className="text-lg font-bold flex items-center gap-2">
+                      <MapPin size={20} className="text-yellow-400" /> 
+                      Ubicación del Vehículo
+                  </label>
+                  
+                  {/* Manual Mode Toggle */}
+                  <button 
+                    type="button" 
+                    onClick={() => setManualMode(!manualMode)}
+                    className="text-xs text-yellow-500 hover:text-yellow-400 underline flex items-center gap-1"
+                  >
+                    {manualMode ? <><MapIcon size={12}/> Mostrar Mapa</> : "Ingresar manualmente"}
+                  </button>
+              </div>
+              
+              <div className="bg-gray-800 p-1 rounded-lg border border-gray-700 overflow-hidden relative transition-all">
+                  {/* --- FALLBACK & ERROR UI --- */}
+                  {showFallback ? (
+                      <div className="bg-gray-800 p-6 flex flex-col items-center justify-center text-center animate-fadeIn">
+                           {/* Only show alert if it's an actual error, not just manual mode */}
+                           {(loadError || mapError) && (
+                               <>
+                                   <AlertTriangle className="text-yellow-500 mb-3" size={40} />
+                                   <h3 className="text-lg font-bold text-white mb-2">Mapa no disponible</h3>
+                               </>
+                           )}
+                           
+                           {/* Fallback Input */}
+                           <div className="w-full mt-2">
+                               <label className="text-xs text-gray-400 mb-2 block text-left">
+                                   Usa tu GPS o pega el link de Google Maps:
+                               </label>
+                               
+                               <button 
+                                    type="button" 
+                                    onClick={handleGetLocation}
+                                    className="w-full flex items-center justify-center gap-2 bg-yellow-500 text-black font-bold py-3 px-4 rounded-lg hover:bg-yellow-400 transition-colors mb-4"
+                                    id="getLocationBtnFallback"
+                                >
+                                    <Navigation size={18} />
+                                    Usar mi ubicación actual (GPS)
+                                </button>
+                               
+                               <div className="text-gray-500 text-xs text-center mb-3 border-b border-gray-700 leading-[0.1em] mt-2">
+                                   <span className="bg-gray-800 px-2">O pega el link manualmente</span>
+                               </div>
+
+                               <input 
+                                    type="url" 
+                                    value={sellerLocation} 
+                                    onChange={(e) => setSellerLocation(e.target.value)} 
+                                    className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm" 
+                                    placeholder="https://maps.google.com/..."
+                               />
+                           </div>
+                      </div>
+                  ) : !isLoaded ? (
+                      <div className="h-[350px] flex items-center justify-center text-gray-400">
+                          Cargando mapa...
+                      </div>
+                  ) : (
+                    <GoogleMap
+                        mapContainerStyle={containerStyle}
+                        center={mapCenter}
+                        zoom={15}
+                        onLoad={onLoadMap}
+                        onClick={handleMapClick}
+                        options={{
+                            streetViewControl: false,
+                            mapTypeControl: false,
+                            styles: [
+                                { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+                                { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+                                { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+                                { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }] },
+                                { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
+                                { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] },
+                            ]
+                        }}
+                    >
+                        {markerPosition && <Marker position={markerPosition} />}
+                    </GoogleMap>
+                  )}
+
+                  {/* Floating GPS Button (Only show if map loaded successfully) */}
+                  {isLoaded && !showFallback && (
+                      <button 
+                        id="getLocationBtn"
+                        type="button" 
+                        onClick={handleGetLocation}
+                        className="absolute bottom-4 right-4 bg-yellow-500 text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition-transform hover:scale-110 z-10"
+                        title="Usar mi ubicación actual"
+                      >
+                        <Navigation size={24} />
+                      </button>
+                  )}
+              </div>
+
+              {/* Hidden input to ensure value is captured */}
+              <input type="hidden" value={sellerLocation} required />
+              
+              {sellerLocation && (
+                  <p className="mt-2 text-xs text-green-400 flex items-center gap-1">
+                      <MapPin size={12}/> Ubicación guardada
+                  </p>
+              )}
+          </div>
+
           <div className="flex justify-between mt-8">
             <Link href="/schedule/personal-info" className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">
               Atrás
             </Link>
-            <button type="submit" className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300">
+            <button type="submit" disabled={!sellerLocation} className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
               Siguiente
             </button>
           </div>

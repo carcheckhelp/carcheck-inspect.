@@ -1,9 +1,9 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import { MapPin, Navigation, Search, AlertTriangle, Map as MapIcon } from 'lucide-react';
+import { MapPin, Navigation, AlertTriangle, Map as MapIcon } from 'lucide-react';
 
 const containerStyle = {
   width: '100%',
@@ -16,8 +16,7 @@ const defaultCenter = {
   lng: -70.6970
 };
 
-// Libraries must be defined outside to avoid re-renders. 
-// Removed 'localContext' as it caused type errors.
+// Libraries must be defined outside to avoid re-renders.
 const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ["places"];
 
 const VehicleInfoPage = () => {
@@ -45,9 +44,12 @@ const VehicleInfoPage = () => {
 
   const router = useRouter();
 
+  // Use the API Key from environment or fallback provided by user
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyCVtCSWD8c8UZaRZy5JXLeO8c4g3rhbY30";
+
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: apiKey,
     libraries: libraries,
   });
 
@@ -60,7 +62,6 @@ const VehicleInfoPage = () => {
       };
 
       return () => {
-          // Cleanup
           (window as any).gm_authFailure = undefined;
       };
   }, []);
@@ -220,8 +221,7 @@ const VehicleInfoPage = () => {
     router.push('/schedule/payment');
   };
 
-  // Determine if we should show the fallback UI
-  const showFallback = loadError || mapError || manualMode;
+  const showMap = isLoaded && !loadError && !mapError && !manualMode;
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
@@ -304,56 +304,18 @@ const VehicleInfoPage = () => {
                     onClick={() => setManualMode(!manualMode)}
                     className="text-xs text-yellow-500 hover:text-yellow-400 underline flex items-center gap-1"
                   >
-                    {manualMode ? <><MapIcon size={12}/> Mostrar Mapa</> : "Ingresar manualmente"}
+                    {manualMode ? (
+                        <><MapIcon size={12}/> Mostrar Mapa</>
+                    ) : (
+                        <><AlertTriangle size={12}/> Ingresar manualmente</>
+                    )}
                   </button>
               </div>
               
               <div className="bg-gray-800 p-1 rounded-lg border border-gray-700 overflow-hidden relative transition-all">
-                  {/* --- FALLBACK & ERROR UI --- */}
-                  {showFallback ? (
-                      <div className="bg-gray-800 p-6 flex flex-col items-center justify-center text-center animate-fadeIn">
-                           {/* Only show alert if it's an actual error, not just manual mode */}
-                           {(loadError || mapError) && (
-                               <>
-                                   <AlertTriangle className="text-yellow-500 mb-3" size={40} />
-                                   <h3 className="text-lg font-bold text-white mb-2">Mapa no disponible</h3>
-                               </>
-                           )}
-                           
-                           {/* Fallback Input */}
-                           <div className="w-full mt-2">
-                               <label className="text-xs text-gray-400 mb-2 block text-left">
-                                   Usa tu GPS o pega el link de Google Maps:
-                               </label>
-                               
-                               <button 
-                                    type="button" 
-                                    onClick={handleGetLocation}
-                                    className="w-full flex items-center justify-center gap-2 bg-yellow-500 text-black font-bold py-3 px-4 rounded-lg hover:bg-yellow-400 transition-colors mb-4"
-                                    id="getLocationBtnFallback"
-                                >
-                                    <Navigation size={18} />
-                                    Usar mi ubicación actual (GPS)
-                                </button>
-                               
-                               <div className="text-gray-500 text-xs text-center mb-3 border-b border-gray-700 leading-[0.1em] mt-2">
-                                   <span className="bg-gray-800 px-2">O pega el link manualmente</span>
-                               </div>
-
-                               <input 
-                                    type="url" 
-                                    value={sellerLocation} 
-                                    onChange={(e) => setSellerLocation(e.target.value)} 
-                                    className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm" 
-                                    placeholder="https://maps.google.com/..."
-                               />
-                           </div>
-                      </div>
-                  ) : !isLoaded ? (
-                      <div className="h-[350px] flex items-center justify-center text-gray-400">
-                          Cargando mapa...
-                      </div>
-                  ) : (
+                  
+                  {/* --- MAP VIEW --- */}
+                  {showMap && (
                     <GoogleMap
                         mapContainerStyle={containerStyle}
                         center={mapCenter}
@@ -377,8 +339,52 @@ const VehicleInfoPage = () => {
                     </GoogleMap>
                   )}
 
-                  {/* Floating GPS Button (Only show if map loaded successfully) */}
-                  {isLoaded && !showFallback && (
+                  {/* --- FALLBACK / LOADING / MANUAL UI --- */}
+                  {!showMap && (
+                      <div className="bg-gray-800 p-6 flex flex-col items-center justify-center text-center animate-fadeIn" style={{ height: '350px' }}>
+                           
+                           {/* Loading State */}
+                           {!isLoaded && !loadError && (
+                               <div className="text-gray-400">Cargando mapa...</div>
+                           )}
+
+                           {/* Error State */}
+                           {(loadError || mapError) && (
+                               <div className="mb-4 text-yellow-500 flex flex-col items-center">
+                                   <AlertTriangle size={30} />
+                                   <span className="text-xs mt-1">
+                                       {!apiKey ? "Falta API Key de Google Maps" : "No se pudo cargar el mapa"}
+                                   </span>
+                               </div>
+                           )}
+                           
+                           {/* Manual Input Form */}
+                           {(manualMode || loadError || mapError) && (
+                               <div className="w-full mt-2">
+                                   <button 
+                                        type="button" 
+                                        onClick={handleGetLocation}
+                                        className="w-full flex items-center justify-center gap-2 bg-yellow-500 text-black font-bold py-3 px-4 rounded-lg hover:bg-yellow-400 transition-colors mb-6 shadow-lg"
+                                        id="getLocationBtnFallback"
+                                    >
+                                        <Navigation size={18} />
+                                        Obtener mi ubicación GPS
+                                    </button>
+                                   
+                                   <input 
+                                        type="url" 
+                                        value={sellerLocation} 
+                                        onChange={(e) => setSellerLocation(e.target.value)} 
+                                        className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm" 
+                                        placeholder="Pegar enlace de Google Maps..."
+                                   />
+                               </div>
+                           )}
+                      </div>
+                  )}
+
+                  {/* Floating GPS Button (Only show if map is visible) */}
+                  {showMap && (
                       <button 
                         id="getLocationBtn"
                         type="button" 
@@ -395,8 +401,8 @@ const VehicleInfoPage = () => {
               <input type="hidden" value={sellerLocation} required />
               
               {sellerLocation && (
-                  <p className="mt-2 text-xs text-green-400 flex items-center gap-1">
-                      <MapPin size={12}/> Ubicación guardada
+                  <p className="mt-2 text-xs text-green-400 flex items-center gap-1 font-bold bg-green-900/30 p-2 rounded border border-green-900/50">
+                      <MapPin size={14}/> ¡Ubicación guardada correctamente!
                   </p>
               )}
           </div>

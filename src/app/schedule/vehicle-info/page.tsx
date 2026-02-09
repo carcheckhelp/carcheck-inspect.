@@ -17,8 +17,8 @@ const defaultCenter = {
 };
 
 // Libraries must be defined outside to avoid re-renders. 
-// We keep 'places' in case we add other features later, but it's not strictly needed for just the map/pin.
-const libraries: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ["places"];
+// Removed 'localContext' as it caused type errors.
+const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ["places"];
 
 const VehicleInfoPage = () => {
   const [make, setMake] = useState('');

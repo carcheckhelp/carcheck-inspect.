@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import UnifiedEmailTemplate from '@/components/emails/UnifiedEmailTemplate';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +19,19 @@ const fromEmail = 'CarCheck <onboarding@resend.dev>';
 // Helper function to add a delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Helper to log to file
+function logToFile(message: string) {
+    try {
+        const logPath = path.join(process.cwd(), 'public', 'email-debug.log');
+        const timestamp = new Date().toISOString();
+        const logEntry = `[${timestamp}] ${message}\n`;
+        // Append to file
+        fs.appendFileSync(logPath, logEntry);
+    } catch (e) {
+        console.error('Failed to write to log file', e);
+    }
+}
+
 export async function POST(request: Request) {
   let body;
   try {
@@ -26,12 +41,17 @@ export async function POST(request: Request) {
   }
 
   const { orderNumber, personalInfo, vehicleInfo, selectedPackage } = body;
+  
+  logToFile(`Received request for Order #${orderNumber}`);
+
   if (!orderNumber || !personalInfo?.email || !vehicleInfo || !selectedPackage) {
+    logToFile(`Error: Missing data for Order #${orderNumber}`);
     return new Response(JSON.stringify({ error: 'Faltan datos esenciales en la solicitud.' }), { status: 400 });
   }
 
   try {
     // --- 2. Send Customer Email (First) ---
+    logToFile(`Attempting to send customer email to ${personalInfo.email}`);
     const customerEmailResult = await resend.emails.send({
       from: fromEmail,
       to: [personalInfo.email],
@@ -40,7 +60,7 @@ export async function POST(request: Request) {
     });
 
     if (customerEmailResult.error) {
-        console.error(`CRITICAL FAILURE: Could not send customer email (Order #${orderNumber}).`, customerEmailResult.error);
+        logToFile(`CRITICAL FAILURE: Customer email failed. Error: ${JSON.stringify(customerEmailResult.error)}`);
         
         // Check specifically for API key error
         if (customerEmailResult.error.message?.includes('API key')) {
@@ -56,14 +76,13 @@ export async function POST(request: Request) {
             details: customerEmailResult.error.message
         }), { status: 500 });
     }
+    logToFile(`Customer email sent successfully. ID: ${customerEmailResult.data?.id}`);
 
     // --- 3. Wait to avoid Rate Limits ---
-    // Resend free tier has a rate limit (e.g. 2 req/sec). We wait 1.5 seconds to be safe.
     await delay(1500);
 
     // --- 4. Send Inspector Email (Second) ---
-    // Log before sending to debug
-    console.log(`Attempting to send inspector email to: ${inspectorEmail}`);
+    logToFile(`Attempting to send inspector email to ${inspectorEmail}`);
 
     const inspectorEmailResult = await resend.emails.send({
       from: fromEmail,
@@ -73,10 +92,10 @@ export async function POST(request: Request) {
     });
 
     if (inspectorEmailResult.error) {
+        logToFile(`WARNING: Inspector email failed. Error: ${JSON.stringify(inspectorEmailResult.error)}`);
         console.warn(`WARNING: Customer email sent, but INSPECTOR email failed (Order #${orderNumber}).`, inspectorEmailResult.error);
-        console.error('Inspector email error details:', JSON.stringify(inspectorEmailResult.error, null, 2));
     } else {
-        console.log('Inspector email sent successfully:', inspectorEmailResult.data);
+        logToFile(`Inspector email sent successfully. ID: ${inspectorEmailResult.data?.id}`);
     }
 
     // --- 5. Success --- 
@@ -86,8 +105,9 @@ export async function POST(request: Request) {
     });
 
   } catch (e: any) {
+    logToFile(`Catastrophic failure: ${e.message}`);
     console.error(`Catastrophic failure during email send process (Order #${orderNumber}):`, e);
-    // If it's an API key error, handle it gracefully
+    
     if (e.message?.includes('API key') || e.statusCode === 401 || e.message?.includes('missing')) {
          return NextResponse.json({ 
             message: 'Error de autenticación con servicio de correos.',

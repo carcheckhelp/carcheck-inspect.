@@ -62,6 +62,9 @@ export async function POST(request: Request) {
     await delay(1500);
 
     // --- 4. Send Inspector Email (Second) ---
+    // Log before sending to debug
+    console.log(`Attempting to send inspector email to: ${inspectorEmail}`);
+
     const inspectorEmailResult = await resend.emails.send({
       from: fromEmail,
       to: [inspectorEmail],
@@ -71,7 +74,9 @@ export async function POST(request: Request) {
 
     if (inspectorEmailResult.error) {
         console.warn(`WARNING: Customer email sent, but INSPECTOR email failed (Order #${orderNumber}).`, inspectorEmailResult.error);
-        // We log the error but do NOT fail the request, as the user has received their confirmation.
+        console.error('Inspector email error details:', JSON.stringify(inspectorEmailResult.error, null, 2));
+    } else {
+        console.log('Inspector email sent successfully:', inspectorEmailResult.data);
     }
 
     // --- 5. Success --- 

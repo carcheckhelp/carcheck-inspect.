@@ -14,9 +14,6 @@ const resend = new Resend(resendApiKey);
 
 // --- CONFIGURACIÓN DE CORREOS ---
 const inspectorEmail = 'carcheckhelp1@outlook.com'; 
-
-// IMPORTANTE: Como el dominio carcheckdr.com está verificado, DEBES usar un correo de ese dominio.
-// Si usas onboarding@resend.dev, solo podrás enviar a tu propio correo de registro.
 const fromEmail = 'CarCheck <info@carcheckdr.com>';
 
 // Helper function to add a delay
@@ -55,20 +52,17 @@ export async function POST(request: Request) {
   try {
     // --- 2. Send Customer Email (First) ---
     // Enviamos el correo de confirmación al CLIENTE.
-    // También enviamos una copia oculta (BCC) o directa al INSPECTOR para que tenga constancia de la confirmación.
+    // Usamos BCC para el inspector, así recibe una copia exacta sin que el cliente vea su dirección necesariamente.
     
-    logToFile(`Attempting to send customer email to ${personalInfo.email} and copy to ${inspectorEmail}`);
+    logToFile(`Attempting to send customer email to ${personalInfo.email} with BCC to ${inspectorEmail}`);
     
-    const recipients = [personalInfo.email];
-    
-    // Si el correo del cliente es diferente al del inspector, agregamos al inspector para que le llegue también.
-    if (personalInfo.email !== inspectorEmail) {
-        recipients.push(inspectorEmail);
-    }
+    // Si el cliente es el mismo inspector, no usamos BCC para evitar doble envío al mismo buzón en el mismo mensaje
+    const bccRecipients = (personalInfo.email !== inspectorEmail) ? [inspectorEmail] : undefined;
 
     const customerEmailResult = await resend.emails.send({
       from: fromEmail,
-      to: recipients,
+      to: [personalInfo.email],
+      bcc: bccRecipients, // Copia oculta al inspector
       subject: `✅ Confirmación de Cita CarCheck - Orden #${orderNumber}`,
       react: UnifiedEmailTemplate({ ...body, forInspector: false }),
     });
@@ -76,27 +70,24 @@ export async function POST(request: Request) {
     if (customerEmailResult.error) {
         logToFile(`CRITICAL FAILURE: Customer email failed. Error: ${JSON.stringify(customerEmailResult.error)}`);
         
-        // Check specifically for API key error
         if (customerEmailResult.error.message?.includes('API key')) {
              return NextResponse.json({ 
-                message: 'Error de configuración de API Key (Correo omitido para permitir flujo).',
+                message: 'Error de configuración de API Key.',
                 inspectorEmailFailed: true,
                 errorDetails: customerEmailResult.error.message
             });
         }
-
-        return new Response(JSON.stringify({ 
-            error: 'No se pudo enviar el correo de confirmación. Por favor verifica tu email.',
-            details: customerEmailResult.error.message
-        }), { status: 500 });
+        // Continuamos intentando enviar el segundo correo aunque falle el primero
+    } else {
+        logToFile(`Customer email sent successfully. ID: ${customerEmailResult.data?.id}`);
     }
-    logToFile(`Customer email sent successfully. ID: ${customerEmailResult.data?.id}`);
 
     // --- 3. Wait to avoid Rate Limits ---
-    await delay(1500);
+    await delay(2000); // Increased delay to 2s
 
     // --- 4. Send Inspector Email (Second) ---
     // Este es el correo interno con formato de "Alerta" para el inspector.
+    // Si el inspector es el mismo que el cliente (pruebas), le llegará este segundo correo también.
     logToFile(`Attempting to send inspector email to ${inspectorEmail}`);
 
     const inspectorEmailResult = await resend.emails.send({
@@ -122,13 +113,6 @@ export async function POST(request: Request) {
     logToFile(`Catastrophic failure: ${e.message}`);
     console.error(`Catastrophic failure during email send process (Order #${orderNumber}):`, e);
     
-    if (e.message?.includes('API key') || e.statusCode === 401 || e.message?.includes('missing')) {
-         return NextResponse.json({ 
-            message: 'Error de autenticación con servicio de correos.',
-            inspectorEmailFailed: true 
-        });
-    }
-
     return new Response(JSON.stringify({ 
       error: 'Ocurrió un error inesperado durante el proceso de envío de correos.', 
       details: e.message 

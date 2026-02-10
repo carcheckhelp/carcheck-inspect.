@@ -2,15 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import InspectionPDF from '@/components/InspectionPDF';
 
-// Dynamically import PDFDownloadLink to avoid SSR issues with @react-pdf/renderer
-const PDFDownloadLink = dynamic(
-  () => import('@react-pdf/renderer').then((mod) => mod.PDFDownloadLink),
-  { 
-    ssr: false,
-    loading: () => <button className="bg-gray-700 text-white font-bold py-2 px-4 rounded opacity-50 cursor-wait">Cargando PDF...</button>
-  }
+// Dynamic import of the button that USES react-pdf
+const DownloadInspectionButton = dynamic(
+    () => import('@/components/DownloadInspectionButton'),
+    { ssr: false, loading: () => <div className="text-gray-500 text-sm">Cargando PDF...</div> }
 );
 
 interface Order {
@@ -30,10 +26,8 @@ export default function InspectorDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
     const fetchOrders = async () => {
       try {
         const response = await fetch('/api/inspector/orders');
@@ -109,22 +103,10 @@ export default function InspectorDashboard() {
                                 >
                                     Ver Detalles
                                 </button>
-                                {order.aiReport && isClient && (
-                                    <PDFDownloadLink document={<InspectionPDF order={order} />} fileName={`reporte_${order.id}.pdf`}>
-                                        {({ blob, url, loading, error }) => (
-                                            <button 
-                                                className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center"
-                                                title="Descargar PDF"
-                                                disabled={loading}
-                                            >
-                                               {loading ? '...' : (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                                    </svg>
-                                               )}
-                                            </button>
-                                        )}
-                                    </PDFDownloadLink>
+                                {order.aiReport && (
+                                    <div className="w-auto">
+                                        <DownloadInspectionButton order={order} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center" />
+                                    </div>
                                 )}
                             </div>
                         )}

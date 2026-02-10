@@ -84,7 +84,24 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
       return Math.round((answeredPoints / totalPoints) * 100);
   };
 
+  const validateInspection = () => {
+      // Get all points from all categories
+      const allPoints = inspectionCategories.flatMap(c => c.points);
+      
+      // Check if every point has a status in inspectionResults (either 'ok', 'attention', 'fail', or 'na')
+      const missingPoints = allPoints.filter(point => !inspectionResults[point]);
+      
+      return missingPoints;
+  };
+
   const handleSave = async () => {
+      const missingPoints = validateInspection();
+      
+      if (missingPoints.length > 0) {
+          alert(`No puedes guardar la inspección. Faltan ${missingPoints.length} puntos por revisar.\n\nPor favor revisa todas las categorías.`);
+          return;
+      }
+
       setSaving(true);
       try {
           const response = await fetch(`/api/inspector/orders/${params.orderId}`, {
@@ -118,6 +135,7 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
   if (error) return <div className="min-h-screen bg-black text-red-500 flex justify-center items-center">Error: {error}</div>;
 
   const progress = calculateProgress();
+  const missingPointsCount = validateInspection().length;
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-8">
@@ -143,19 +161,28 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
 
         <div className="sticky top-0 z-10 bg-black py-4 border-b border-gray-800 mb-6">
             <div className="flex justify-between text-sm mb-1">
-                <span>Progreso</span>
+                <span>Progreso {missingPointsCount > 0 ? `(${missingPointsCount} pendientes)` : '(Completo)'}</span>
                 <span>{progress}%</span>
             </div>
             <div className="w-full bg-gray-800 rounded-full h-2.5">
-                <div className="bg-yellow-500 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+                <div 
+                    className={`h-2.5 rounded-full transition-all duration-300 ${progress === 100 ? 'bg-green-500' : 'bg-yellow-500'}`} 
+                    style={{ width: `${progress}%` }}
+                ></div>
             </div>
         </div>
 
         <div className="space-y-8">
             {inspectionCategories.map((category) => (
                 <div key={category.id} className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-                    <h2 className="text-xl font-bold mb-4 text-blue-400 border-b border-gray-800 pb-2">
+                    <h2 className="text-xl font-bold mb-4 text-blue-400 border-b border-gray-800 pb-2 flex justify-between">
                         {category.title}
+                        {/* Indicador visual si la categoría está completa o no */}
+                        {category.points.every(p => inspectionResults[p]) ? (
+                            <span className="text-green-500 text-sm font-normal">✓ Completa</span>
+                        ) : (
+                            <span className="text-yellow-500 text-sm font-normal">● Pendiente</span>
+                        )}
                     </h2>
                     <div className="space-y-4">
                         {category.points.map((point) => (
@@ -242,9 +269,13 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
                 Cancelar
             </button>
             <button 
-                className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 shadow-lg shadow-yellow-500/20 disabled:opacity-50 flex items-center"
+                className={`text-black font-bold py-3 px-6 rounded-lg shadow-lg disabled:opacity-50 flex items-center transition-colors ${
+                    missingPointsCount > 0 
+                    ? 'bg-gray-500 cursor-not-allowed' // Deshabilitado visualmente si faltan puntos
+                    : 'bg-yellow-500 hover:bg-yellow-400 shadow-yellow-500/20'
+                }`}
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving} // Ya no deshabilitamos el botón por puntos faltantes en el HTML 'disabled', sino que manejamos la validación en onClick para poder mostrar el mensaje de alerta.
             >
                 {saving ? (
                     <>
@@ -254,7 +285,9 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
                         </svg>
                         Guardando...
                     </>
-                ) : 'Guardar Inspección'}
+                ) : (
+                    missingPointsCount > 0 ? `Faltan ${missingPointsCount} Puntos` : 'Guardar Inspección'
+                )}
             </button>
         </div>
       </div>

@@ -1,42 +1,42 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/firebaseAdmin'; // Import the function, not the db instance
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/firebase/admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  try {
-    // Await the params promise to resolve
-    const { id } = await context.params;
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+    try {
+        const orderId = params.id;
+        
+        console.log(`[API Report] Fetching order: ${orderId}`);
 
-    // Get the database instance inside the request handler
-    const db = getDb();
+        // CORRECCIÓN: Buscar en la colección 'appointments', que es donde se guardan las órdenes e inspecciones.
+        let doc = await db.collection('appointments').doc(orderId).get();
+        let data = doc.exists ? doc.data() : null;
+        let id = doc.id;
 
-    const reportDoc = await db.collection('reports').doc(id).get();
+        if (!doc.exists) {
+            console.log(`[API Report] Not found by ID. Searching by orderNumber...`);
+            // Intentar buscar por campo 'orderNumber' si el ID no coincide directamente (por si acaso)
+            const querySnapshot = await db.collection('appointments').where('orderNumber', '==', orderId).limit(1).get();
+            
+            if (!querySnapshot.empty) {
+                doc = querySnapshot.docs[0];
+                data = doc.data();
+                id = doc.id;
+                console.log(`[API Report] Found by orderNumber: ${id}`);
+            } else {
+                console.log(`[API Report] Order not found.`);
+                return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+            }
+        }
 
-    if (!reportDoc.exists) {
-      return new NextResponse(
-        JSON.stringify({ message: `No se encontró un informe con el ID: ${id}` }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
-      );
+        if (data) {
+             console.log(`[API Report] Returning data for ${id}. Status: ${data.status}, Has AI Report: ${!!data.aiReport}`);
+        }
+
+        return NextResponse.json({ id, ...data });
+    } catch (error: any) {
+        console.error('Error fetching order details:', error);
+        return NextResponse.json({ error: 'Failed to fetch order details', details: error.message }, { status: 500 });
     }
-
-    const reportData = reportDoc.data();
-
-    const report = {
-      id: reportDoc.id,
-      ...reportData
-    };
-
-    return NextResponse.json(report);
-
-  } catch (error: any) {
-    console.error(`Error fetching report from Firestore:`, error);
-    return new NextResponse(
-      JSON.stringify({ 
-        message: 'Error interno del servidor al obtener el informe.',
-        error: error.message
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
 }

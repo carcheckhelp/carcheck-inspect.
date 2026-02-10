@@ -1,10 +1,24 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { inspectionCategories } from './inspectionPoints';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Usar la clave proporcionada si no hay una variable de entorno
+const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyD-_i_GI9EGgDqqqIr6Unbq4rxbJMFrLyo';
+
+if (!apiKey) {
+    console.error("CRITICAL: GEMINI_API_KEY is missing!");
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export const runInspectionReport = async (inspectionData: any) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  if (!apiKey) {
+      console.error("Cannot generate report: No Gemini API Key provided.");
+      return "El análisis automático no está disponible porque falta la configuración de IA del sistema.";
+  }
+
+  // IMPORTANTE: gemini-pro original ha sido deprecado en algunas regiones/versiones.
+  // Usamos gemini-1.5-flash que es el estándar actual rápido y gratuito (tier free).
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   // Format the detailed inspection results for the prompt
   let inspectionDetailsText = "";
@@ -25,9 +39,10 @@ export const runInspectionReport = async (inspectionData: any) => {
 
         for (const point of categoryPoints) {
             const status = inspectionData.inspectionResults[point];
+            
             if (status === 'attention' || status === 'fail') {
                 hasIssues = true;
-                const statusText = status === 'fail' ? 'MALO (Requiere reparación)' : 'ATENCIÓN (Requiere revisión)';
+                const statusText = status === 'fail' ? 'MALO (Requiere reparación urgente)' : 'ATENCIÓN (Requiere revisión futura)';
                 inspectionDetailsText += `- ${point}: ${statusText}\n`;
             }
         }
@@ -38,36 +53,22 @@ export const runInspectionReport = async (inspectionData: any) => {
   }
 
   const prompt = `
-    Eres un experto mecánico automotriz senior y perito certificado de vehículos con años de experiencia evaluando autos usados para compradores potenciales.
+    Eres un experto mecánico automotriz senior y perito certificado de vehículos.
     
-    Tu tarea es generar un **Informe de Inspección Vehicular Premium** basado en los datos recolectados por un inspector en campo. El cliente final es una persona que probablemente no sepa mucho de mecánica, por lo que tu lenguaje debe ser claro, profesional, empático y directo.
-
+    Genera un **Informe de Inspección Vehicular Profesional** para un cliente comprador.
+    
     **Datos del Vehículo:**
     - Vehículo: ${inspectionData.vehicle.make} ${inspectionData.vehicle.model} ${inspectionData.vehicle.year}
     - Cliente: ${inspectionData.clientName}
 
     ${inspectionDetailsText}
 
-    **Instrucciones Específicas para el Informe:**
-
-    1.  **Resumen Ejecutivo (Vital):** Comienza con un veredicto claro. ¿Es una buena compra? Usa un sistema de semáforo (Verde: Compra segura, Amarillo: Precaución/Negociar, Rojo: Evitar/Riesgo alto). Resume los 2-3 hallazgos más críticos aquí.
-
-    2.  **Análisis de Estado (Por Categorías):**
-        *   Analiza las categorías (Motor, Transmisión, Carrocería, Interior, etc.) basándote en los puntos marcados como "MALO" o "ATENCIÓN".
-        *   Si una categoría no tiene problemas, indícalo brevemente ("El motor funciona correctamente sin fugas ni ruidos aparentes").
-        *   Para los problemas encontrados, explica **por qué es importante** y **qué podría pasar si no se arregla**. (Ej: "La fuga en el amortiguador delantero afecta la estabilidad en frenado y debe cambiarse pronto").
-
-    3.  **Observaciones del Inspector:** Si hay notas específicas del inspector en los datos, intégralas en el análisis de la categoría correspondiente o crea una sección de "Notas de Campo" si son generales.
-
-    4.  **Recomendaciones de Reparación y Mantenimiento:**
-        *   Crea una lista priorizada de lo que se debe arreglar **Inmediatamente (Seguridad)**, **Pronto (Mecánica)** y **Eventualmente (Estética/Confort)**.
-        *   Si es posible, estima la urgencia de cada reparación.
-
-    5.  **Estimación de Costos (Aproximada):** Si detectas fallos graves (como fugas de aceite, fallos en transmisión, frenos en mal estado), menciona si la reparación suele ser costosa (Alta, Media, Baja) para dar contexto al comprador, sin dar precios exactos en moneda.
-
-    6.  **Conclusión Final:** Un párrafo de cierre amigable recomendando si proceder con la compra, negociar el precio debido a los desperfectos, o buscar otro vehículo.
-
-    **Formato:** Usa Markdown limpio con encabezados, viñetas y negritas para facilitar la lectura rápida. NO inventes fallos que no estén en los datos. Si todo está bien, felicita al comprador por encontrar un buen vehículo.
+    **Estructura del Informe:**
+    1.  **Veredicto General:** ¿Recomiendas la compra? (Sí/No/Con Reservas) y puntaje del 1 al 10.
+    2.  **Análisis de Fallos:** Explica técnicamente los problemas encontrados ("MALO" o "ATENCIÓN") y sus riesgos.
+    3.  **Recomendaciones:** Lista de reparaciones urgentes y estimación de costos (Bajo/Medio/Alto).
+    
+    Sé directo y profesional. Usa Markdown.
   `;
 
   try {
@@ -75,8 +76,14 @@ export const runInspectionReport = async (inspectionData: any) => {
     const response = await result.response;
     const text = response.text();
     return text;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating inspection report:', error);
-    return 'Error al generar el análisis inteligente. Por favor, inténtelo de nuevo más tarde.';
+    
+    const errorMessage = error.message || error.toString();
+    
+    if (errorMessage.includes('API key')) return 'Error de configuración: Clave de API inválida.';
+    if (errorMessage.includes('404')) return `El modelo de IA no está disponible temporalmente (${errorMessage}).`;
+
+    return `Error técnico al generar el análisis: ${errorMessage}. Por favor contacte a soporte.`;
   }
 };

@@ -14,10 +14,11 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // State to store inspection results: { [pointName]: status }
-  // status can be 'ok', 'attention', 'fail'
+  // status can be 'ok', 'attention', 'fail', 'na' (not applicable)
   const [inspectionResults, setInspectionResults] = useState<Record<string, string>>({});
   
   // State to store observations per category
@@ -65,23 +66,51 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
   };
 
   const calculateProgress = () => {
+      // Solo cuentan los puntos que NO son "na" (No Aplica)
+      const applicablePoints = inspectionCategories.flatMap(c => c.points)
+        .filter(point => inspectionResults[point] !== 'na');
+        
+      if (applicablePoints.length === 0) return 0;
+
+      const completedPoints = applicablePoints.filter(point => 
+          inspectionResults[point] && inspectionResults[point] !== 'na'
+      ).length;
+
+      // Necesitamos normalizar respecto al total de puntos posibles que no se han marcado como NA
+      // Pero para la barra de progreso mientras se llena, mejor usamos el total fijo
       const totalPoints = inspectionCategories.reduce((acc, cat) => acc + cat.points.length, 0);
-      const completedPoints = Object.keys(inspectionResults).length;
-      return Math.round((completedPoints / totalPoints) * 100);
+      const answeredPoints = Object.keys(inspectionResults).length;
+      
+      return Math.round((answeredPoints / totalPoints) * 100);
   };
 
   const handleSave = async () => {
+      setSaving(true);
       try {
-          // In a real app, send data to API
-          console.log('Saving inspection:', { inspectionResults, categoryObservations });
-          // await fetch(`/api/inspector/inspection/${params.orderId}`, {
-          //   method: 'POST',
-          //   body: JSON.stringify({ inspectionResults, categoryObservations })
-          // });
-          alert('Inspección guardada localmente (simulación)');
-      } catch (e) {
+          const response = await fetch(`/api/inspector/orders/${params.orderId}`, {
+              method: 'POST', // Use POST or PUT to update
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                  inspectionResults, 
+                  categoryObservations,
+                  status: 'completed' // Mark as completed or in-progress
+              })
+          });
+
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'Failed to save inspection');
+          }
+
+          alert('Inspección guardada correctamente y reporte generado.');
+          router.push('/inspector/dashboard'); 
+      } catch (e: any) {
           console.error('Error saving:', e);
-          alert('Error al guardar');
+          alert(`Error al guardar: ${e.message}`);
+      } finally {
+          setSaving(false);
       }
   };
 
@@ -130,38 +159,56 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
                     </h2>
                     <div className="space-y-4">
                         {category.points.map((point) => (
-                            <div key={point} className="flex flex-col md:flex-row md:items-center justify-between gap-3 py-2 border-b border-gray-800 last:border-0">
-                                <span className="text-gray-300 flex-1">{point}</span>
+                            <div key={point} className={`flex flex-col md:flex-row md:items-center justify-between gap-3 py-2 border-b border-gray-800 last:border-0 ${inspectionResults[point] === 'na' ? 'opacity-50' : ''}`}>
+                                <span className={`text-gray-300 flex-1 ${inspectionResults[point] === 'na' ? 'line-through' : ''}`}>{point}</span>
                                 <div className="flex gap-2 shrink-0">
                                     <button
                                         onClick={() => handlePointChange(point, 'ok')}
+                                        disabled={inspectionResults[point] === 'na'}
                                         className={`px-3 py-1 rounded text-sm font-bold transition-colors ${
                                             inspectionResults[point] === 'ok' 
                                             ? 'bg-green-600 text-white ring-2 ring-green-400' 
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                                         }`}
                                     >
                                         Bien
                                     </button>
                                     <button
                                         onClick={() => handlePointChange(point, 'attention')}
+                                        disabled={inspectionResults[point] === 'na'}
                                         className={`px-3 py-1 rounded text-sm font-bold transition-colors ${
                                             inspectionResults[point] === 'attention' 
                                             ? 'bg-yellow-600 text-white ring-2 ring-yellow-400' 
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                                         }`}
                                     >
                                         Atención
                                     </button>
                                     <button
                                         onClick={() => handlePointChange(point, 'fail')}
+                                        disabled={inspectionResults[point] === 'na'}
                                         className={`px-3 py-1 rounded text-sm font-bold transition-colors ${
                                             inspectionResults[point] === 'fail' 
                                             ? 'bg-red-600 text-white ring-2 ring-red-400' 
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                                         }`}
                                     >
                                         Mal
+                                    </button>
+                                    
+                                    {/* Botón para marcar como No Aplica */}
+                                    <button
+                                        onClick={() => handlePointChange(point, inspectionResults[point] === 'na' ? '' : 'na')}
+                                        className={`px-2 py-1 rounded text-sm font-bold transition-colors ml-2 ${
+                                            inspectionResults[point] === 'na'
+                                            ? 'bg-gray-600 text-white ring-2 ring-gray-400'
+                                            : 'bg-gray-800 text-gray-500 hover:bg-gray-700 hover:text-gray-300'
+                                        }`}
+                                        title={inspectionResults[point] === 'na' ? "Habilitar punto" : "Marcar como No Aplica"}
+                                    >
+                                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -186,18 +233,28 @@ const InspectionPage = ({ params }: { params: { orderId: string } }) => {
             ))}
         </div>
 
-        <div className="mt-8 flex justify-end gap-4">
+        <div className="mt-8 flex justify-end gap-4 pb-12">
             <button 
-                className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600"
+                className="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 disabled:opacity-50"
                 onClick={() => router.back()}
+                disabled={saving}
             >
                 Cancelar
             </button>
             <button 
-                className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 shadow-lg shadow-yellow-500/20"
+                className="bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 shadow-lg shadow-yellow-500/20 disabled:opacity-50 flex items-center"
                 onClick={handleSave}
+                disabled={saving}
             >
-                Guardar Inspección
+                {saving ? (
+                    <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Guardando...
+                    </>
+                ) : 'Guardar Inspección'}
             </button>
         </div>
       </div>

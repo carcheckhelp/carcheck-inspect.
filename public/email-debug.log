@@ -1,0 +1,40 @@
+[2026-02-09T23:45:10.013Z] Received request for Order #CC-1770680697727
+[2026-02-09T23:45:10.014Z] Attempting to send customer email to andhersonr111@gmail.com
+[2026-02-09T23:45:10.202Z] Received request for Order #CC-1770680697727
+[2026-02-09T23:45:10.203Z] Attempting to send customer email to andhersonr111@gmail.com
+[2026-02-09T23:45:10.653Z] Customer email sent successfully. ID: dea692cb-cfed-4c26-8b41-d561745f2aba
+[2026-02-09T23:45:10.769Z] Customer email sent successfully. ID: 9de3f59f-264b-4adf-8511-a806ddcbbb0c
+[2026-02-09T23:45:12.154Z] Attempting to send inspector email to carcheckhelp1@outlook.com
+[2026-02-09T23:45:12.270Z] Attempting to send inspector email to carcheckhelp1@outlook.com
+[2026-02-09T23:45:12.314Z] WARNING: Inspector email failed. Error: {"statusCode":403,"name":"validation_error","message":"You can only send testing emails to your own email address (andhersonr111@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain."}
+[2026-02-09T23:45:12.433Z] WARNING: Inspector email failed. Error: {"statusCode":403,"name":"validation_error","message":"You can only send testing emails to your own email address (andhersonr111@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain."}
+[2026-02-09T23:48:15.075Z] Received request for Order #CC-1770680887988
+[2026-02-09T23:48:15.075Z] Attempting to send customer email to andhersonr111@gmail.com
+[2026-02-09T23:48:15.080Z] Received request for Order #CC-1770680887988
+[2026-02-09T23:48:15.092Z] Attempting to send customer email to andhersonr111@gmail.com
+[2026-02-09T23:48:15.522Z] Customer email sent successfully. ID: 64441878-3f37-4dd3-be47-968ffec7a248
+[2026-02-09T23:48:15.543Z] Customer email sent successfully. ID: bc5c8b8a-5c98-4a06-942e-6a3d507d1af5
+[2026-02-09T23:48:17.021Z] Attempting to send inspector email to andhersonr111@gmail.com
+[2026-02-09T23:48:17.043Z] Attempting to send inspector email to andhersonr111@gmail.com
+[2026-02-09T23:48:17.191Z] Inspector email sent successfully. ID: acd87c7b-4459-4fff-82c2-7441353e8e76
+[2026-02-09T23:48:17.212Z] Inspector email sent successfully. ID: b483d041-7213-45f0-b8de-d566f9d421c9
+[2026-02-09T23:50:20.793Z] Received request for Order #CC-1770681017629
+[2026-02-09T23:50:20.795Z] Attempting to send customer email to andhersonr111@gmail.com
+[2026-02-09T23:50:20.804Z] Received request for Order #CC-1770681017630
+[2026-02-09T23:50:20.805Z] Attempting to send customer email to andhersonr111@gmail.com
+[2026-02-09T23:50:21.481Z] Customer email sent successfully. ID: 720b6149-9d66-4861-9c85-d067ef34a7a0
+[2026-02-09T23:50:21.487Z] Customer email sent successfully. ID: 3fc3f2a3-52d2-47d6-92a1-a5a8ff44f774
+[2026-02-09T23:50:22.982Z] Attempting to send inspector email to carcheckhelp1@outlook.com
+[2026-02-09T23:50:22.996Z] Attempting to send inspector email to carcheckhelp1@outlook.com
+[2026-02-09T23:50:23.122Z] WARNING: Inspector email failed. Error: {"statusCode":403,"name":"validation_error","message":"You can only send testing emails to your own email address (andhersonr111@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain."}
+[2026-02-09T23:50:23.191Z] WARNING: Inspector email failed. Error: {"statusCode":403,"name":"validation_error","message":"You can only send testing emails to your own email address (andhersonr111@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain."}
+[2026-02-10T13:36:17.840Z] Received request for Order #CC-1770730568493
+[2026-02-10T13:36:17.840Z] Attempting to send customer email to andhersonr111@gmail.com and copy to carcheckhelp1@outlook.com
+[2026-02-10T13:36:17.954Z] Received request for Order #CC-1770730568494
+[2026-02-10T13:36:17.954Z] Attempting to send customer email to andhersonr111@gmail.com and copy to carcheckhelp1@outlook.com
+[2026-02-10T13:36:18.374Z] Customer email sent successfully. ID: 471a9854-7331-4166-a86a-3d8636dc6cb8
+[2026-02-10T13:36:18.376Z] Customer email sent successfully. ID: f0fc43da-3f9c-48f7-91a5-fe03e55dd8c8
+[2026-02-10T13:36:19.876Z] Attempting to send inspector email to carcheckhelp1@outlook.com
+[2026-02-10T13:36:19.878Z] Attempting to send inspector email to carcheckhelp1@outlook.com
+[2026-02-10T13:36:20.040Z] Inspector email sent successfully. ID: b628dcb6-1d4a-4f9f-a914-5a74b1c37b1a
+[2026-02-10T13:36:20.059Z] Inspector email sent successfully. ID: 99b6d7f0-9850-4579-8b7b-97891b1da8fa

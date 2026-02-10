@@ -10,80 +10,123 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey);
 
-export const runInspectionReport = async (inspectionData: any) => {
-  if (!apiKey) {
-      console.error("Cannot generate report: No Gemini API Key provided.");
-      return "El análisis automático no está disponible porque falta la configuración de IA del sistema.";
-  }
-
-  // IMPORTANTE: gemini-pro original ha sido deprecado en algunas regiones/versiones.
-  // Usamos gemini-1.5-flash que es el estándar actual rápido y gratuito (tier free).
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-  // Format the detailed inspection results for the prompt
-  let inspectionDetailsText = "";
-  
-  if (inspectionData.inspectionResults) {
-    inspectionDetailsText += "**Detalle de Puntos Inspeccionados:**\n";
-    // Group by category to make it easier for Gemini
-    for (const category of inspectionCategories) {
-        inspectionDetailsText += `\n**Categoría: ${category.title}**\n`;
-        
-        // Add observations for this category if any
-        if (inspectionData.categoryObservations && inspectionData.categoryObservations[category.id]) {
-             inspectionDetailsText += `*Observaciones del Inspector:* ${inspectionData.categoryObservations[category.id]}\n`;
+// Función de respaldo (Fallback) por si Gemini falla o no hay API Key
+const generateFallbackReport = (inspectionData: any) => {
+    let report = `## Informe de Inspección (Modo Respaldo)\n\n`;
+    report += `**Vehículo:** ${inspectionData.vehicle.make} ${inspectionData.vehicle.model} ${inspectionData.vehicle.year}\n\n`;
+    
+    let criticalIssues = [];
+    let attentionIssues = [];
+    
+    if (inspectionData.inspectionResults) {
+        for (const [point, status] of Object.entries(inspectionData.inspectionResults)) {
+            if (status === 'fail') criticalIssues.push(point);
+            if (status === 'attention') attentionIssues.push(point);
         }
+    }
 
-        const categoryPoints = category.points;
-        let hasIssues = false;
+    report += `### Resumen del Estado\n`;
+    if (criticalIssues.length > 0) {
+        report += `El vehículo presenta **${criticalIssues.length} problemas críticos** que requieren reparación inmediata. No se recomienda la compra sin antes presupuestar estas reparaciones.\n`;
+    } else if (attentionIssues.length > 0) {
+        report += `El vehículo se encuentra en condiciones generales aceptables, pero tiene **${attentionIssues.length} puntos de atención** que requerirán mantenimiento a mediano plazo.\n`;
+    } else {
+        report += `El vehículo se encuentra en **excelentes condiciones**. No se detectaron fallos visibles durante la inspección.\n`;
+    }
 
-        for (const point of categoryPoints) {
-            const status = inspectionData.inspectionResults[point];
+    report += `\n### Análisis de Fallos Detectados\n`;
+    if (criticalIssues.length > 0) {
+        report += `**Requieren Atención Inmediata (Riesgo de Seguridad/Mecánico):**\n`;
+        criticalIssues.forEach(issue => report += `- ${issue}\n`);
+    }
+    if (attentionIssues.length > 0) {
+        report += `\n**Puntos a Observar (Desgaste Normal/Mantenimiento Futuro):**\n`;
+        attentionIssues.forEach(issue => report += `- ${issue}\n`);
+    }
+    if (criticalIssues.length === 0 && attentionIssues.length === 0) {
+        report += `No se encontraron fallos significativos.\n`;
+    }
+
+    report += `\n### Recomendaciones Generales\n`;
+    report += `1. **Mantenimiento Preventivo:** Realizar cambio de aceite y filtros si no hay historial reciente.\n`;
+    report += `2. **Documentación:** Verificar que no existan multas pendientes y realizar el cambio de propietario.\n`;
+    if (attentionIssues.length > 0) {
+        report += `3. **Seguimiento:** Programar una revisión de los puntos de "Atención" en los próximos 3-6 meses.\n`;
+    }
+
+    return report;
+};
+
+export const runInspectionReport = async (inspectionData: any) => {
+  // Intentar usar Gemini primero
+  try {
+      if (!apiKey) throw new Error("No API Key");
+
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+      // Formatear resultados detallados para el prompt (INCLUYENDO TODO)
+      let inspectionDetailsText = "**Detalle Completo de la Inspección:**\n";
+      
+      if (inspectionData.inspectionResults) {
+        for (const category of inspectionCategories) {
+            inspectionDetailsText += `\n**Categoría: ${category.title}**\n`;
             
-            if (status === 'attention' || status === 'fail') {
-                hasIssues = true;
-                const statusText = status === 'fail' ? 'MALO (Requiere reparación urgente)' : 'ATENCIÓN (Requiere revisión futura)';
+            // Observaciones
+            if (inspectionData.categoryObservations && inspectionData.categoryObservations[category.id]) {
+                 inspectionDetailsText += `*Observaciones del Inspector:* ${inspectionData.categoryObservations[category.id]}\n`;
+            }
+
+            const categoryPoints = category.points;
+            let categoryHasIssues = false;
+
+            for (const point of categoryPoints) {
+                const status = inspectionData.inspectionResults[point] || 'na'; // Default to na if missing
+                let statusText = 'No inspeccionado';
+                
+                if (status === 'ok') statusText = 'BUENO (Funciona correctamente)';
+                if (status === 'attention') {
+                    statusText = 'ATENCIÓN (Desgaste visible o requiere revisión futura)';
+                    categoryHasIssues = true;
+                }
+                if (status === 'fail') {
+                    statusText = 'MALO (Falla crítica, requiere reparación)';
+                    categoryHasIssues = true;
+                }
+                
+                // Incluimos TODOS los puntos para que la IA vea el panorama completo
                 inspectionDetailsText += `- ${point}: ${statusText}\n`;
             }
         }
-        if (!hasIssues) {
-            inspectionDetailsText += "- Todos los puntos verificados en esta categoría están en buen estado.\n";
-        }
-    }
-  }
+      }
 
-  const prompt = `
-    Eres un experto mecánico automotriz senior y perito certificado de vehículos.
-    
-    Genera un **Informe de Inspección Vehicular Profesional** para un cliente comprador.
-    
-    **Datos del Vehículo:**
-    - Vehículo: ${inspectionData.vehicle.make} ${inspectionData.vehicle.model} ${inspectionData.vehicle.year}
-    - Cliente: ${inspectionData.clientName}
+      const prompt = `
+        Actúa como un Perito Mecánico Senior y Asesor de Compra Automotriz.
+        
+        Tu tarea es generar un informe detallado para el cliente interesado en este vehículo.
+        
+        **Vehículo:** ${inspectionData.vehicle.make} ${inspectionData.vehicle.model} ${inspectionData.vehicle.year}
+        **Cliente:** ${inspectionData.clientName}
 
-    ${inspectionDetailsText}
+        ${inspectionDetailsText}
 
-    **Estructura del Informe:**
-    1.  **Veredicto General:** ¿Recomiendas la compra? (Sí/No/Con Reservas) y puntaje del 1 al 10.
-    2.  **Análisis de Fallos:** Explica técnicamente los problemas encontrados ("MALO" o "ATENCIÓN") y sus riesgos.
-    3.  **Recomendaciones:** Lista de reparaciones urgentes y estimación de costos (Bajo/Medio/Alto).
-    
-    Sé directo y profesional. Usa Markdown.
-  `;
+        **Instrucciones para el Informe:**
+        1.  **Resumen Ejecutivo:** Comienza con una valoración clara (Puntaje 1-10) y si recomiendas la compra.
+        2.  **Estado General:** Resume lo que ESTÁ BIEN. Es importante que el cliente sepa qué sistemas funcionan correctamente para darle tranquilidad.
+        3.  **Análisis de Problemas (Si existen):** Explica los puntos marcados como MALO o ATENCIÓN. ¿Qué implican? ¿Son caros de arreglar?
+        4.  **Recomendaciones de Mantenimiento (IA Proactiva):** Incluso si el auto está perfecto, da 3-4 recomendaciones para mantenerlo así (ej. tipo de aceite, cuidado de pintura, revisión de frenos por kilometraje). Si hay fallos, prioriza sus reparaciones.
+        
+        Usa un tono profesional, objetivo y útil. Formato Markdown limpio.
+      `;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    return text;
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+
   } catch (error: any) {
-    console.error('Error generating inspection report:', error);
+    console.error('Error generating Gemini report:', error);
+    console.log('Falling back to rule-based report generator...');
     
-    const errorMessage = error.message || error.toString();
-    
-    if (errorMessage.includes('API key')) return 'Error de configuración: Clave de API inválida.';
-    if (errorMessage.includes('404')) return `El modelo de IA no está disponible temporalmente (${errorMessage}).`;
-
-    return `Error técnico al generar el análisis: ${errorMessage}. Por favor contacte a soporte.`;
+    // Fallback a lógica preprogramada si falla la IA
+    return generateFallbackReport(inspectionData);
   }
 };

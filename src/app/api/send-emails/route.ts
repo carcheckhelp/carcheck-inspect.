@@ -12,9 +12,12 @@ const resendApiKey = HARDCODED_KEY;
 
 const resend = new Resend(resendApiKey);
 
-// Hardcoded inspector email as requested
-const inspectorEmail = 'carcheckhelp1@outlook.com';
-const fromEmail = 'CarCheck <onboarding@resend.dev>';
+// --- CONFIGURACIÓN DE CORREOS ---
+const inspectorEmail = 'carcheckhelp1@outlook.com'; 
+
+// IMPORTANTE: Como el dominio carcheckdr.com está verificado, DEBES usar un correo de ese dominio.
+// Si usas onboarding@resend.dev, solo podrás enviar a tu propio correo de registro.
+const fromEmail = 'CarCheck <info@carcheckdr.com>';
 
 // Helper function to add a delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -51,10 +54,21 @@ export async function POST(request: Request) {
 
   try {
     // --- 2. Send Customer Email (First) ---
-    logToFile(`Attempting to send customer email to ${personalInfo.email}`);
+    // Enviamos el correo de confirmación al CLIENTE.
+    // También enviamos una copia oculta (BCC) o directa al INSPECTOR para que tenga constancia de la confirmación.
+    
+    logToFile(`Attempting to send customer email to ${personalInfo.email} and copy to ${inspectorEmail}`);
+    
+    const recipients = [personalInfo.email];
+    
+    // Si el correo del cliente es diferente al del inspector, agregamos al inspector para que le llegue también.
+    if (personalInfo.email !== inspectorEmail) {
+        recipients.push(inspectorEmail);
+    }
+
     const customerEmailResult = await resend.emails.send({
       from: fromEmail,
-      to: [personalInfo.email],
+      to: recipients,
       subject: `✅ Confirmación de Cita CarCheck - Orden #${orderNumber}`,
       react: UnifiedEmailTemplate({ ...body, forInspector: false }),
     });
@@ -82,6 +96,7 @@ export async function POST(request: Request) {
     await delay(1500);
 
     // --- 4. Send Inspector Email (Second) ---
+    // Este es el correo interno con formato de "Alerta" para el inspector.
     logToFile(`Attempting to send inspector email to ${inspectorEmail}`);
 
     const inspectorEmailResult = await resend.emails.send({
@@ -93,7 +108,6 @@ export async function POST(request: Request) {
 
     if (inspectorEmailResult.error) {
         logToFile(`WARNING: Inspector email failed. Error: ${JSON.stringify(inspectorEmailResult.error)}`);
-        console.warn(`WARNING: Customer email sent, but INSPECTOR email failed (Order #${orderNumber}).`, inspectorEmailResult.error);
     } else {
         logToFile(`Inspector email sent successfully. ID: ${inspectorEmailResult.data?.id}`);
     }

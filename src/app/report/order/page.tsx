@@ -77,9 +77,9 @@ export default function ReportPage() {
     const reportHtml = orderData.report ? markdownToHtml(orderData.report) : '';
     
     // Categorize inspection points for display
-    const passedPoints = [];
-    const attentionPoints = [];
-    const failedPoints = [];
+    const passedPoints: string[] = [];
+    const attentionPoints: string[] = [];
+    const failedPoints: string[] = [];
 
     if (orderData.inspectionResults) {
         Object.entries(orderData.inspectionResults).forEach(([key, value]) => {

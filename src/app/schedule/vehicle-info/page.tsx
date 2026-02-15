@@ -225,6 +225,18 @@ const VehicleInfoPage = () => {
         return;
     }
     
+    // Ensure map pin is set
+    if (!markerPosition && !manualMode && !sellerLocation) {
+        alert("Por favor, marca la ubicación del vehículo en el mapa.");
+        return;
+    }
+
+    // Double check if using manual mode but empty
+    if (manualMode && !sellerLocation) {
+        alert("Por favor, ingresa el enlace de ubicación.");
+        return;
+    }
+
     const vehicleInfo = { make, model, vin, year, appointmentDate: date, appointmentTime: time };
     localStorage.setItem('vehicleInfo', JSON.stringify(vehicleInfo));
 
@@ -424,6 +436,13 @@ const VehicleInfoPage = () => {
 
               {/* Hidden input to ensure value is captured */}
               <input type="hidden" value={sellerLocation} required />
+              
+              {/* Show error if tried submitting without location */}
+              {!sellerLocation && (
+                  <p className="mt-2 text-xs text-red-400 flex items-center gap-1">
+                      <AlertTriangle size={14}/> Debes seleccionar la ubicación en el mapa
+                  </p>
+              )}
               
               {sellerLocation && (
                   <p className="mt-2 text-xs text-green-400 flex items-center gap-1 font-bold bg-green-900/30 p-2 rounded border border-green-900/50">

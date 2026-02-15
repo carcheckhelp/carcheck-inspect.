@@ -10,6 +10,7 @@ const PaymentPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,6 +45,11 @@ const PaymentPage = () => {
   const handleConfirmation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderSummary) return;
+    
+    if (!termsAccepted) {
+      alert("Por favor acepte los términos y condiciones.");
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -59,7 +65,7 @@ const PaymentPage = () => {
     localStorage.setItem('appointmentData', JSON.stringify(appointmentData));
 
     // Navigate to confirmation page
-    router.push('/confirmation'); // Note: changed from /schedule/confirmation to /confirmation based on file list
+    router.push('/confirmation');
   };
 
   if (isLoading) {
@@ -143,18 +149,10 @@ const PaymentPage = () => {
             {/* Payment Details Sections */}
             {paymentMethod === 'transfer' && (
                 <div className="bg-gray-800 p-5 rounded-lg border border-gray-700 animate-fadeIn">
-                    <p className="font-bold text-lg mb-2 text-center text-yellow-400">Datos Bancarios</p>
-                    <div className="space-y-2 text-center">
-                        <p>Banco: <span className="font-bold text-white">BHD</span></p>
-                        <p>Cuenta: <span className="font-bold text-white tracking-wider">16718560011</span></p>
-                        <p>Beneficiario: <span className="font-bold text-white">Venecia Tavarez</span></p>
-                    </div>
-                    <div className="mt-4 text-xs text-gray-400 text-center bg-gray-900 p-3 rounded">
-                        <p className="mb-1">Enviar comprobante a:</p>
-                        <p className="font-mono text-yellow-500">carcheckhelp1@outlook.com</p>
-                        <p className="mt-1 flex justify-center items-center gap-1">
-                            <FaWhatsapp className="text-green-500"/> <span>809-315-7892</span>
-                        </p>
+                    <p className="font-bold text-lg mb-2 text-center text-yellow-400">Pago por Transferencia</p>
+                    <div className="text-center text-gray-300 space-y-2">
+                        <p>Al confirmar su cita, un inspector se pondrá en contacto para proporcionarle los datos bancarios y completar el proceso.</p>
+                        <p className="text-sm text-gray-400 mt-2">Su cita quedará reservada pendiente de pago.</p>
                     </div>
                 </div>
             )}
@@ -175,6 +173,21 @@ const PaymentPage = () => {
                 </div>
             )}
           </div>
+          
+          <div className="mb-6 p-4 bg-gray-800/50 rounded border border-gray-700">
+             <div className="flex items-start gap-3">
+               <input 
+                 type="checkbox" 
+                 id="terms" 
+                 checked={termsAccepted} 
+                 onChange={(e) => setTermsAccepted(e.target.checked)}
+                 className="mt-1 w-5 h-5 accent-yellow-500 cursor-pointer"
+               />
+               <label htmlFor="terms" className="text-sm text-gray-300 cursor-pointer">
+                 Entiendo y acepto que <span className="text-yellow-500 font-bold">CarCheck</span> no se hace responsable de daños mecánicos, eléctricos o estéticos que puedan surgir en el vehículo después de realizada la inspección. El reporte refleja el estado del vehículo únicamente en el momento de la revisión.
+               </label>
+             </div>
+          </div>
 
           <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-700">
             <Link href="/schedule/vehicle-info" className="text-gray-400 hover:text-white transition-colors underline">
@@ -182,7 +195,7 @@ const PaymentPage = () => {
             </Link>
             <button 
                 type="submit" 
-                disabled={isSubmitting} 
+                disabled={isSubmitting || !termsAccepted} 
                 className="bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg hover:bg-yellow-400 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-yellow-500/20"
             >
               {isSubmitting ? 'Procesando...' : 'Confirmar Cita'}

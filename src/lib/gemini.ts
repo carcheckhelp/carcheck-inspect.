@@ -62,7 +62,8 @@ export const runInspectionReport = async (inspectionData: any) => {
   try {
       if (!apiKey) throw new Error("No API Key");
 
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Actualizado a gemini-1.5-pro para mejor razonamiento (versión de pago/premium)
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
       // Formatear resultados detallados para el prompt (INCLUYENDO TODO)
       let inspectionDetailsText = "**Detalle Completo de la Inspección:**\n";
